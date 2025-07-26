@@ -1,420 +1,1050 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gifts Mini App</title>
+    <title>Gifts App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --accent-color: #4a8cff;
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #3a3a3a;
+            --success-color: #4caf50;
+            --danger-color: #f44336;
+        }
+        
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
         }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
         .container {
+            padding: 16px;
             max-width: 100%;
-            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
-        .balance {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+        .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 16px;
+            color: white;
         }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .username {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .user-id {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .balance-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .balance-icon {
+            font-size: 24px;
+            margin-right: 12px;
+            color: var(--accent-color);
+        }
+        
+        .balance-info {
+            flex: 1;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+        
+        .balance-amount {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 16px;
+            padding-left: 8px;
+        }
+        
         .menu {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 80px;
         }
+        
         .menu-button {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 12px;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
         }
+        
         .menu-button:hover {
-            background-color: #f0f0f0;
+            background-color: #333333;
         }
-        .section {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+        .menu-button i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--accent-color);
         }
-        .back-button {
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            margin-top: 10px;
+        
+        .menu-button-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+        }
+        
+        .nav-button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .payment-method {
+        
+        .nav-button.active {
+            color: var(--accent-color);
+            background-color: rgba(74, 140, 255, 0.1);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 24px auto;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 6px solid var(--border-color);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+        
+        .wheel-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
             display: flex;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            justify-content: center;
+            overflow: hidden;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .wheel-section span {
+            position: absolute;
+            transform: rotate(45deg);
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        
+        .wheel-center {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .wheel-arrow {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 20px solid var(--accent-color);
+            z-index: 5;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 90%;
+            width: 320px;
+            border: 1px solid var(--border-color);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .modal-text {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
             cursor: pointer;
         }
-        .payment-method:last-child {
-            border-bottom: none;
-        }
-        .payment-icon {
-            margin-right: 10px;
-            font-size: 20px;
-        }
-        .input-amount {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .submit-button {
-            background-color: #007aff;
+        
+        .button {
+            background-color: var(--accent-color);
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 12px;
             width: 100%;
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s ease;
         }
-        .error {
-            color: red;
-            margin-bottom: 10px;
+        
+        .button:hover {
+            background-color: #3a7be0;
         }
-        .gift-item {
+        
+        .case-container {
+            height: 180px;
+            margin: 20px 0;
             display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            align-items: center;
+            justify-content: center;
         }
-        .gift-item:last-child {
-            border-bottom: none;
+        
+        .case {
+            width: 120px;
+            height: 120px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .case i {
+            font-size: 40px;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+            transition: all 0.5s ease;
+        }
+        
+        .case-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .upgrade-info {
+            text-align: center;
+            margin: 16px 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .selected-gifts {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 16px 0;
+            min-height: 60px;
+        }
+        
+        .selected-gift {
+            width: 40px;
+            height: 40px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .inventory-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .inventory-item-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .inventory-item-icon {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+        
+        .inventory-item-quantity {
+            font-weight: 600;
+        }
+        
+        #ton-amount {
+            width: 100%;
+            padding: 8px;
+            margin: 12px 0;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <!-- Главный экран -->
-        <div id="main-screen">
-            <div class="header">
-                <h2>🎁 Gifts Mini App</h2>
+        <!-- Главный экран - Профиль -->
+        <div id="profile-section" class="section active">
+            <div class="profile-header">
+                <div class="avatar" id="user-avatar">U</div>
+                <div class="profile-info">
+                    <div class="username" id="username">Username</div>
+                    <div class="user-id">ID: <span id="user-id">123456789</span></div>
+                </div>
             </div>
-            <div class="balance">
-                <h3>Ваш баланс: <span id="balance">0</span> 💎</h3>
+            
+            <div class="balance-card">
+                <i class="fas fa-gem balance-icon"></i>
+                <div class="balance-info">
+                    <div class="balance-label">Ваш баланс</div>
+                    <div class="balance-amount"><span id="balance">0</span> 💎</div>
+                </div>
             </div>
+            
+            <h2 class="section-title">Действия</h2>
             <div class="menu">
-                <div class="menu-button" onclick="showGames()">
-                    🎮 Мини-игры
+                <div class="menu-button" data-action="show-section" data-value="games-section">
+                    <i class="fas fa-gamepad"></i>
+                    <div class="menu-button-text">Игры</div>
                 </div>
-                <div class="menu-button" onclick="showProfile()">
-                    👤 Профиль
+                <div class="menu-button" data-action="show-section" data-value="inventory-section">
+                    <i class="fas fa-box-open"></i>
+                    <div class="menu-button-text">Инвентарь</div>
                 </div>
-                <div class="menu-button" onclick="showDeposit()">
-                    💎 Пополнить
+                <div class="menu-button" data-action="show-section" data-value="cases-section">
+                    <i class="fas fa-gift"></i>
+                    <div class="menu-button-text">Кейсы</div>
                 </div>
-                <div class="menu-button" onclick="showInventory()">
-                    🎁 Инвентарь
-                </div>
-            </div>
-        </div>
-
-        <!-- Экран мини-игр -->
-        <div id="games-screen" style="display: none;">
-            <div class="section">
-                <h3>🎮 Мини-игры</h3>
-                <div class="menu-button" onclick="showUpgradeGifts()">
-                    🎁 Апгрейд подарков
-                </div>
-                <div class="menu-button" onclick="showCases()">
-                    🎲 Кейсы
-                </div>
-                <div class="menu-button" onclick="showRoulette()">
-                    🎡 Рулетка
-                </div>
-                <div class="back-button" onclick="backToMain()">
-                    🔙 Назад
+                <div class="menu-button" data-action="show-section" data-value="roulette-section">
+                    <i class="fas fa-dharmachakra"></i>
+                    <div class="menu-button-text">Рулетка</div>
                 </div>
             </div>
         </div>
-
-        <!-- Экран пополнения баланса -->
-        <div id="deposit-screen" style="display: none;">
-            <div class="section">
-                <h3>💎 Пополнение баланса</h3>
-                <p>Выберите способ пополнения:</p>
-                <div class="payment-method" onclick="showTonPayment()">
-                    <div class="payment-icon">💰</div>
-                    <div>TON Wallet</div>
+        
+        <!-- Экран игр -->
+        <div id="games-section" class="section">
+            <h2 class="section-title">Мини-игры</h2>
+            <div class="menu">
+                <div class="menu-button" data-action="show-section" data-value="upgrade-section">
+                    <i class="fas fa-sync-alt"></i>
+                    <div class="menu-button-text">Апгрейд</div>
                 </div>
-                <div class="back-button" onclick="backToMain()">
-                    🔙 Назад
+                <div class="menu-button" data-action="show-section" data-value="cases-section">
+                    <i class="fas fa-gift"></i>
+                    <div class="menu-button-text">Кейсы</div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Экран оплаты через TON -->
-        <div id="ton-payment-screen" style="display: none;">
-            <div class="section">
-                <h3>💰 Пополнение через TON</h3>
-                <p>Введите сумму в алмазах:</p>
-                <input type="number" id="ton-amount" class="input-amount" placeholder="100">
-                <div id="ton-error" class="error"></div>
-                <button class="submit-button" onclick="processTonPayment()">Продолжить</button>
-                <div class="back-button" onclick="backToDeposit()">
-                    🔙 Назад
+                <div class="menu-button" data-action="show-section" data-value="roulette-section">
+                    <i class="fas fa-dharmachakra"></i>
+                    <div class="menu-button-text">Рулетка</div>
+                </div>
+                <div class="menu-button" data-action="show-section" data-value="profile-section">
+                    <i class="fas fa-arrow-left"></i>
+                    <div class="menu-button-text">Назад</div>
                 </div>
             </div>
         </div>
-
-        <!-- Экран апгрейда подарков -->
-        <div id="upgrade-gifts-screen" style="display: none;">
-            <div class="section">
-                <h3>🎁 Апгрейд подарков</h3>
-                <div id="gifts-list"></div>
-                <div class="back-button" onclick="backToGames()">
-                    🔙 Назад
-                </div>
-            </div>
-        </div>
-
-        <!-- Экран кейсов -->
-        <div id="cases-screen" style="display: none;">
-            <div class="section">
-                <h3>🎲 Кейсы</h3>
-                <div class="menu-button" onclick="openCase(100)">
-                    Обычный кейс (100 💎)
-                </div>
-                <div class="menu-button" onclick="openCase(500)">
-                    Редкий кейс (500 💎)
-                </div>
-                <div class="menu-button" onclick="openCase(2000)">
-                    Эпический кейс (2000 💎)
-                </div>
-                <div class="back-button" onclick="backToGames()">
-                    🔙 Назад
-                </div>
-            </div>
-        </div>
-
-        <!-- Экран рулетки -->
-        <div id="roulette-screen" style="display: none;">
-            <div class="section">
-                <h3>🎡 Рулетка</h3>
-                <div class="menu-button" onclick="playRoulette(100)">
-                    Обычная рулетка (100 💎)
-                </div>
-                <div class="menu-button" onclick="playRoulette(500)">
-                    Редкая рулетка (500 💎)
-                </div>
-                <div class="menu-button" onclick="playRoulette(5000, true)">
-                    Супер рулетка (5 TON)
-                </div>
-                <div class="back-button" onclick="backToGames()">
-                    🔙 Назад
-                </div>
-            </div>
-        </div>
-
-        <!-- Экран профиля -->
-        <div id="profile-screen" style="display: none;">
-            <div class="section">
-                <h3>👤 Профиль</h3>
-                <p>ID: <span id="user-id"></span></p>
-                <p>Имя: <span id="username"></span></p>
-                <p>Баланс: <span id="profile-balance"></span> 💎</p>
-                <div class="back-button" onclick="backToMain()">
-                    🔙 Назад
-                </div>
-            </div>
-        </div>
-
+        
         <!-- Экран инвентаря -->
-        <div id="inventory-screen" style="display: none;">
-            <div class="section">
-                <h3>🎁 Ваши подарки</h3>
-                <div id="inventory-list"></div>
-                <div class="back-button" onclick="backToMain()">
-                    🔙 Назад
+        <div id="inventory-section" class="section">
+            <h2 class="section-title">Ваши подарки</h2>
+            <div id="inventory-list" style="margin-bottom: 80px;">
+                <!-- Подарки будут здесь -->
+            </div>
+        </div>
+        
+        <!-- Экран кейсов -->
+        <div id="cases-section" class="section">
+            <h2 class="section-title">Кейсы</h2>
+            
+            <div class="case-container">
+                <div class="case" id="case">
+                    <i class="fas fa-box"></i>
+                    <div class="case-text">Выберите кейс</div>
                 </div>
             </div>
+            
+            <div class="menu">
+                <div class="menu-button" data-action="open-case" data-value="100">
+                    <i class="fas fa-box"></i>
+                    <div class="menu-button-text">Обычный (100💎)</div>
+                </div>
+                <div class="menu-button" data-action="open-case" data-value="500">
+                    <i class="fas fa-box-open"></i>
+                    <div class="menu-button-text">Редкий (500💎)</div>
+                </div>
+                <div class="menu-button" data-action="open-case" data-value="2000">
+                    <i class="fas fa-gem"></i>
+                    <div class="menu-button-text">Эпический (2000💎)</div>
+                </div>
+                <div class="menu-button" data-action="show-section" data-value="profile-section">
+                    <i class="fas fa-arrow-left"></i>
+                    <div class="menu-button-text">Назад</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Экран рулетки -->
+        <div id="roulette-section" class="section">
+            <h2 class="section-title">Рулетка</h2>
+            
+            <div class="wheel-container">
+                <div class="wheel-arrow"></div>
+                <div class="wheel" id="wheel">
+                    <!-- Секции колеса будут добавлены через JS -->
+                </div>
+                <div class="wheel-center">?</div>
+            </div>
+            
+            <div class="menu">
+                <div class="menu-button" data-action="spin-wheel" data-value="100">
+                    <i class="fas fa-coins"></i>
+                    <div class="menu-button-text">100💎</div>
+                </div>
+                <div class="menu-button" data-action="spin-wheel" data-value="500">
+                    <i class="fas fa-star"></i>
+                    <div class="menu-button-text">500💎</div>
+                </div>
+                <div class="menu-button" data-action="show-ton-payment" data-value="1000">
+                    <i class="fab fa-telegram"></i>
+                    <div class="menu-button-text">5 TON</div>
+                </div>
+                <div class="menu-button" data-action="show-section" data-value="profile-section">
+                    <i class="fas fa-arrow-left"></i>
+                    <div class="menu-button-text">Назад</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Экран апгрейда -->
+        <div id="upgrade-section" class="section">
+            <h2 class="section-title">Апгрейд подарков</h2>
+            
+            <div class="upgrade-info">
+                Выберите 3 подарка одного типа для апгрейда
+            </div>
+            
+            <div class="selected-gifts" id="selected-gifts">
+                <!-- Выбранные подарки будут здесь -->
+            </div>
+            
+            <div class="wheel-container">
+                <div class="wheel-arrow"></div>
+                <div class="wheel" id="upgrade-wheel">
+                    <!-- Секции колеса апгрейда будут добавлены через JS -->
+                </div>
+                <div class="wheel-center"><i class="fas fa-random"></i></div>
+            </div>
+            
+            <div class="menu">
+                <div class="menu-button" data-action="spin-upgrade">
+                    <i class="fas fa-random"></i>
+                    <div class="menu-button-text">Выбрать</div>
+                </div>
+                <div class="menu-button" data-action="process-upgrade" id="upgrade-button" style="display: none;">
+                    <i class="fas fa-arrow-up"></i>
+                    <div class="menu-button-text">Апгрейд</div>
+                </div>
+                <div class="menu-button" data-action="clear-selection">
+                    <i class="fas fa-trash"></i>
+                    <div class="menu-button-text">Очистить</div>
+                </div>
+                <div class="menu-button" data-action="show-section" data-value="profile-section">
+                    <i class="fas fa-arrow-left"></i>
+                    <div class="menu-button-text">Назад</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Нижняя навигационная панель -->
+    <div class="nav-bar">
+        <button class="nav-button active" data-section="profile-section">
+            <i class="fas fa-user"></i>
+        </button>
+        <button class="nav-button" data-section="games-section">
+            <i class="fas fa-gamepad"></i>
+        </button>
+        <button class="nav-button" data-section="cases-section">
+            <i class="fas fa-gift"></i>
+        </button>
+        <button class="nav-button" data-section="roulette-section">
+            <i class="fas fa-dharmachakra"></i>
+        </button>
+    </div>
+    
+    <!-- Модальное окно для результатов -->
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <button class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="modal-title" id="modal-title">Результат</h3>
+            <div class="modal-text" id="modal-text">
+                <!-- Текст модального окна -->
+            </div>
+            <button class="button" id="modal-close-button">
+                Закрыть
+            </button>
+        </div>
+    </div>
+    
+    <!-- Модальное окно для TON платежа -->
+    <div class="modal" id="ton-modal">
+        <div class="modal-content">
+            <button class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="modal-title">Пополнение баланса</h3>
+            <div class="modal-text">
+                Введите сумму в алмазах для пополнения через TON:
+                <input type="number" id="ton-amount">
+            </div>
+            <button class="button" id="ton-pay-button">
+                Оплатить
+            </button>
         </div>
     </div>
 
     <script>
         // Инициализация WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // Имитация базы данных
+        
+        // Данные пользователя
         let userData = {
-            userId: tg.initDataUnsafe.user?.id || 123456789,
-            username: tg.initDataUnsafe.user?.username || 'User',
-            balance: 1000,
+            balance: 1500,
             inventory: [
-                { id: 1, name: "Обычный подарок", value: 100, quantity: 5 },
-                { id: 2, name: "Редкий подарок", value: 500, quantity: 2 }
-            ]
+                { id: 1, name: "Обычный подарок", value: 100, quantity: 5, icon: "fas fa-gift", color: "#4CAF50" },
+                { id: 2, name: "Редкий подарок", value: 500, quantity: 2, icon: "fas fa-gem", color: "#2196F3" },
+                { id: 3, name: "Эпический подарок", value: 2000, quantity: 1, icon: "fas fa-crown", color: "#9C27B0" }
+            ],
+            selectedGifts: []
         };
 
-        // Глобальные переменные
-        let currentScreen = 'main';
+        // Призы для рулетки
+        const roulettePrizes = [
+            { type: "diamonds", value: 50, text: "50💎" },
+            { type: "diamonds", value: 100, text: "100💎" },
+            { type: "diamonds", value: 200, text: "200💎" },
+            { type: "gift", value: 100, text: "Подарок" },
+            { type: "diamonds", value: 150, text: "150💎" },
+            { type: "nothing", value: 0, text: "Увы :(" },
+            { type: "diamonds", value: 300, text: "300💎" },
+            { type: "gift", value: 500, text: "Редкий" }
+        ];
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            updateBalance();
-            document.getElementById('user-id').textContent = userData.userId;
-            document.getElementById('username').textContent = userData.username;
-            document.getElementById('profile-balance').textContent = userData.balance;
+            initApp();
         });
 
-        // Обновление баланса
+        function initApp() {
+            // Установка данных пользователя из Telegram
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                document.getElementById('username').textContent = user.first_name || 'Пользователь';
+                document.getElementById('user-id').textContent = user.id;
+                
+                const avatar = document.getElementById('user-avatar');
+                avatar.textContent = user.first_name ? user.first_name[0].toUpperCase() : 'U';
+                
+                const colors = ['#4a8cff', '#ff6b6b', '#6bceff', '#a78bfa', '#66d9e8'];
+                const colorIndex = user.id % colors.length;
+                avatar.style.backgroundColor = colors[colorIndex];
+            }
+            
+            updateBalance();
+            initWheel();
+            initUpgradeWheel();
+            renderInventory();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Навигационные кнопки
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId) showSection(sectionId);
+                });
+            });
+
+            // Кнопки меню
+            document.querySelectorAll('.menu-button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    const value = this.getAttribute('data-value');
+                    
+                    if (action === 'show-section') {
+                        showSection(value);
+                    } 
+                    else if (action === 'open-case') {
+                        openCase(parseInt(value));
+                    }
+                    else if (action === 'spin-wheel') {
+                        spinWheel(parseInt(value));
+                    }
+                    else if (action === 'spin-upgrade') {
+                        spinUpgradeWheel();
+                    }
+                    else if (action === 'process-upgrade') {
+                        processUpgrade();
+                    }
+                    else if (action === 'clear-selection') {
+                        clearSelection();
+                    }
+                    else if (action === 'show-ton-payment') {
+                        showTonPayment(value);
+                    }
+                });
+            });
+
+            // Модальные окна
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modalId = this.closest('.modal').id;
+                    closeModal(modalId);
+                });
+            });
+
+            document.getElementById('modal-close-button').addEventListener('click', function() {
+                closeModal('result-modal');
+            });
+
+            document.getElementById('ton-pay-button').addEventListener('click', processTonPayment);
+        }
+
         function updateBalance() {
             document.getElementById('balance').textContent = userData.balance;
-            document.getElementById('profile-balance').textContent = userData.balance;
         }
 
-        // Навигация по экранам
-        function showScreen(screen) {
-            document.getElementById(`${currentScreen}-screen`).style.display = 'none';
-            document.getElementById(`${screen}-screen`).style.display = 'block';
-            currentScreen = screen;
+        function showSection(sectionId) {
+            // Скрыть все разделы
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Показать выбранный раздел
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Обновить активную кнопку в навигации
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-section') === sectionId) {
+                    btn.classList.add('active');
+                }
+            });
         }
 
-        function backToMain() {
-            showScreen('main');
+        function initWheel() {
+            const wheel = document.getElementById('wheel');
+            wheel.innerHTML = '';
+            
+            const sectionAngle = 360 / roulettePrizes.length;
+            
+            roulettePrizes.forEach((prize, index) => {
+                const section = document.createElement('div');
+                section.className = 'wheel-section';
+                section.style.transform = `rotate(${sectionAngle * index}deg)`;
+                
+                const span = document.createElement('span');
+                span.textContent = prize.text;
+                
+                section.appendChild(span);
+                wheel.appendChild(section);
+            });
         }
 
-        function backToGames() {
-            showScreen('games');
+        function initUpgradeWheel() {
+            const wheel = document.getElementById('upgrade-wheel');
+            wheel.innerHTML = '';
+            
+            const gifts = userData.inventory.filter(g => g.quantity > 0);
+            if (gifts.length === 0) return;
+            
+            const sectionAngle = 360 / gifts.length;
+            
+            gifts.forEach((gift, index) => {
+                const section = document.createElement('div');
+                section.className = 'wheel-section';
+                section.style.transform = `rotate(${sectionAngle * index}deg)`;
+                section.style.backgroundColor = gift.color;
+                
+                const span = document.createElement('span');
+                span.innerHTML = `<i class="${gift.icon}"></i>`;
+                
+                section.appendChild(span);
+                wheel.appendChild(section);
+            });
         }
 
-        function backToDeposit() {
-            showScreen('deposit');
-        }
-
-        function showGames() {
-            showScreen('games');
-        }
-
-        function showProfile() {
-            showScreen('profile');
-        }
-
-        function showDeposit() {
-            showScreen('deposit');
-        }
-
-        function showInventory() {
-            renderInventory();
-            showScreen('inventory');
-        }
-
-        function showTonPayment() {
-            showScreen('ton-payment');
-        }
-
-        function showUpgradeGifts() {
-            renderGifts();
-            showScreen('upgrade-gifts');
-        }
-
-        function showCases() {
-            showScreen('cases');
-        }
-
-        function showRoulette() {
-            showScreen('roulette');
-        }
-
-        // Рендер инвентаря
         function renderInventory() {
             const inventoryList = document.getElementById('inventory-list');
             inventoryList.innerHTML = '';
-
-            if (userData.inventory.length === 0) {
-                inventoryList.innerHTML = '<p>У вас пока нет подарков</p>';
+            
+            if (userData.inventory.filter(g => g.quantity > 0).length === 0) {
+                inventoryList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">У вас пока нет подарков</p>';
                 return;
             }
-
-            userData.inventory.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'gift-item';
-                div.innerHTML = `
-                    <div>${item.name} (${item.value} 💎)</div>
-                    <div>x${item.quantity}</div>
-                `;
-                inventoryList.appendChild(div);
+            
+            userData.inventory.forEach(gift => {
+                if (gift.quantity > 0) {
+                    const giftElement = document.createElement('div');
+                    giftElement.className = 'inventory-item';
+                    
+                    giftElement.innerHTML = `
+                        <div class="inventory-item-info">
+                            <i class="${gift.icon} inventory-item-icon" style="color: ${gift.color}"></i>
+                            <div>
+                                <div style="font-weight: 500;">${gift.name}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Ценность: ${gift.value}💎</div>
+                            </div>
+                        </div>
+                        <div class="inventory-item-quantity">x${gift.quantity}</div>
+                    `;
+                    
+                    inventoryList.appendChild(giftElement);
+                }
             });
         }
 
-        // Рендер подарков для апгрейда
-        function renderGifts() {
-            const giftsList = document.getElementById('gifts-list');
-            giftsList.innerHTML = '';
-
-            if (userData.inventory.length === 0) {
-                giftsList.innerHTML = '<p>У вас нет подарков для апгрейда</p>';
+        function spinWheel(bet, isTon = false) {
+            if (!isTon && userData.balance < bet) {
+                showModal('Ошибка', 'Недостаточно алмазов!');
                 return;
             }
+            
+            if (isTon) {
+                showTonPayment(bet);
+                return;
+            }
+            
+            userData.balance -= bet;
+            updateBalance();
+            
+            const wheel = document.getElementById('wheel');
+            const spinDuration = 4000;
+            const spins = 5;
+            const randomAngle = Math.floor(Math.random() * 360);
+            const totalRotation = spins * 360 + randomAngle;
+            
+            wheel.style.transform = `rotate(${-totalRotation}deg)`;
+            
+            setTimeout(() => {
+                const sectionAngle = 360 / roulettePrizes.length;
+                const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360) / sectionAngle);
+                const prize = roulettePrizes[winningIndex];
+                
+                processPrize(prize);
+            }, spinDuration);
+        }
 
-            userData.inventory.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'menu-button';
-                div.innerHTML = `
-                    ${item.name} (Ценность: ${item.value} 💎)
-                `;
-                div.onclick = function() {
-                    upgradeGift(item.id);
+        function processPrize(prize) {
+            let message = '';
+            
+            if (prize.type === 'diamonds') {
+                userData.balance += prize.value;
+                message = `Вы выиграли ${prize.value} алмазов!`;
+            } 
+            else if (prize.type === 'gift') {
+                const gift = {
+                    id: userData.inventory.length + 1,
+                    name: prize.value === 100 ? "Обычный подарок" : "Редкий подарок",
+                    value: prize.value,
+                    quantity: 1,
+                    icon: prize.value === 100 ? "fas fa-gift" : "fas fa-gem",
+                    color: prize.value === 100 ? "#4CAF50" : "#2196F3"
                 };
-                giftsList.appendChild(div);
+                
+                const existingGift = userData.inventory.find(g => g.value === gift.value);
+                if (existingGift) {
+                    existingGift.quantity += 1;
+                } else {
+                    userData.inventory.push(gift);
+                }
+                
+                message = `Вы выиграли ${gift.name.toLowerCase()}!`;
+                renderInventory();
+            }
+            else {
+                message = "К сожалению, вы ничего не выиграли. Попробуйте ещё раз!";
+            }
+            
+            updateBalance();
+            showModal('Результат', message);
+        }
+
+        function spinUpgradeWheel() {
+            const gifts = userData.inventory.filter(g => g.quantity > 0);
+            if (gifts.length === 0) {
+                showModal('Ошибка', 'У вас нет подарков для апгрейда');
+                return;
+            }
+            
+            const wheel = document.getElementById('upgrade-wheel');
+            const spinDuration = 3000;
+            const spins = 4;
+            const randomAngle = Math.floor(Math.random() * 360);
+            const totalRotation = spins * 360 + randomAngle;
+            
+            wheel.style.transform = `rotate(${-totalRotation}deg)`;
+            
+            setTimeout(() => {
+                const sectionAngle = 360 / gifts.length;
+                const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360) / sectionAngle);
+                const selectedGift = gifts[winningIndex];
+                
+                const existingSelection = userData.selectedGifts.find(g => g.id === selectedGift.id);
+                
+                if (existingSelection) {
+                    const count = userData.selectedGifts.filter(g => g.id === selectedGift.id).length;
+                    if (count >= 3) {
+                        showModal('Внимание', `У вас уже выбрано 3 ${selectedGift.name.toLowerCase()}!`);
+                        return;
+                    }
+                }
+                
+                const giftInInventory = userData.inventory.find(g => g.id === selectedGift.id);
+                if (giftInInventory.quantity <= userData.selectedGifts.filter(g => g.id === selectedGift.id).length) {
+                    showModal('Внимание', `У вас недостаточно ${selectedGift.name.toLowerCase()}!`);
+                    return;
+                }
+                
+                userData.selectedGifts.push(selectedGift);
+                renderSelectedGifts();
+                
+                if (userData.selectedGifts.length >= 3) {
+                    document.getElementById('upgrade-button').style.display = 'block';
+                    showModal('Выбор', 'Вы выбрали 3 подарка. Нажмите "Апгрейд" для улучшения!');
+                }
+            }, spinDuration);
+        }
+
+        function renderSelectedGifts() {
+            const container = document.getElementById('selected-gifts');
+            container.innerHTML = '';
+            
+            const grouped = {};
+            userData.selectedGifts.forEach(gift => {
+                if (!grouped[gift.id]) {
+                    grouped[gift.id] = {
+                        gift: gift,
+                        count: 0
+                    };
+                }
+                grouped[gift.id].count++;
+            });
+            
+            Object.values(grouped).forEach(group => {
+                const giftElement = document.createElement('div');
+                giftElement.className = 'selected-gift';
+                giftElement.style.backgroundColor = group.gift.color;
+                giftElement.innerHTML = `
+                    <i class="${group.gift.icon}"></i>
+                    <div style="position: absolute; bottom: -5px; right: -5px; background: var(--accent-color); color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center;">${group.count}</div>
+                `;
+                container.appendChild(giftElement);
             });
         }
 
-        // Апгрейд подарка
-        function upgradeGift(giftId) {
-            const gift = userData.inventory.find(item => item.id === giftId);
-            if (!gift) return;
+        function clearSelection() {
+            userData.selectedGifts = [];
+            renderSelectedGifts();
+            document.getElementById('upgrade-button').style.display = 'none';
+        }
 
-            // Проверяем, есть ли 3 одинаковых подарка
-            if (gift.quantity < 3) {
-                alert(`Для апгрейда нужно 3 ${gift.name.toLowerCase()}. У вас только ${gift.quantity}.`);
+        function processUpgrade() {
+            if (userData.selectedGifts.length < 3) {
+                showModal('Ошибка', 'Выберите 3 подарка для апгрейда');
                 return;
             }
-
-            // Уменьшаем количество
-            gift.quantity -= 3;
-
-            // Создаем новый подарок с большей ценностью
+            
+            const firstGiftId = userData.selectedGifts[0].id;
+            const allSame = userData.selectedGifts.every(g => g.id === firstGiftId);
+            
+            if (!allSame) {
+                showModal('Ошибка', 'Все подарки должны быть одного типа для апгрейда');
+                return;
+            }
+            
+            const giftValue = userData.selectedGifts[0].value;
+            
+            userData.selectedGifts.forEach(selected => {
+                const gift = userData.inventory.find(g => g.id === selected.id);
+                if (gift) gift.quantity -= 1;
+            });
+            
             let newGiftValue;
-            switch (gift.value) {
+            switch (giftValue) {
                 case 100: newGiftValue = 500; break;
                 case 500: newGiftValue = 2000; break;
                 case 2000: newGiftValue = 5000; break;
-                default:
-                    // Если это уже максимальный подарок, возвращаем алмазы
-                    userData.balance += gift.value * 3;
+                default: 
+                    userData.balance += giftValue * 3;
                     updateBalance();
-                    alert(`Вы получили ${gift.value * 3} 💎 за 3 ${gift.name.toLowerCase()}!`);
-                    renderGifts();
+                    showModal('Апгрейд', `Вы получили ${giftValue * 3} 💎 за 3 подарка!`);
+                    clearSelection();
                     renderInventory();
                     return;
             }
-
-            // Проверяем, есть ли уже такой подарок в инвентаре
-            const existingGift = userData.inventory.find(item => item.value === newGiftValue);
+            
+            const existingGift = userData.inventory.find(g => g.value === newGiftValue);
             if (existingGift) {
                 existingGift.quantity += 1;
             } else {
@@ -422,16 +1052,109 @@
                     id: userData.inventory.length + 1,
                     name: getGiftNameByValue(newGiftValue),
                     value: newGiftValue,
-                    quantity: 1
+                    quantity: 1,
+                    icon: newGiftValue === 500 ? "fas fa-gem" : "fas fa-crown",
+                    color: newGiftValue === 500 ? "#2196F3" : "#9C27B0"
                 });
             }
-
-            alert(`Вы получили 1 ${getGiftNameByValue(newGiftValue).toLowerCase()}!`);
-            renderGifts();
+            
+            showModal('Апгрейд', `Вы получили 1 ${getGiftNameByValue(newGiftValue).toLowerCase()}!`);
+            clearSelection();
             renderInventory();
+            initUpgradeWheel();
         }
 
-        // Получение имени подарка по ценности
+        function openCase(price) {
+            if (userData.balance < price) {
+                showModal('Ошибка', `Недостаточно алмазов! Нужно ${price} 💎`);
+                return;
+            }
+            
+            userData.balance -= price;
+            updateBalance();
+            
+            const caseElement = document.getElementById('case');
+            caseElement.innerHTML = `
+                <i class="fas fa-box"></i>
+                <div class="case-text">Открываем...</div>
+            `;
+            
+            setTimeout(() => {
+                caseElement.style.transform = 'scale(1.1)';
+                caseElement.innerHTML = `
+                    <i class="fas fa-gift"></i>
+                    <div class="case-text">...</div>
+                `;
+                
+                setTimeout(() => {
+                    let giftValue;
+                    const random = Math.random();
+                    
+                    if (price === 100) {
+                        if (random < 0.7) giftValue = 100;
+                        else if (random < 0.95) giftValue = 500;
+                        else giftValue = 2000;
+                    } 
+                    else if (price === 500) {
+                        if (random < 0.6) giftValue = 500;
+                        else if (random < 0.9) giftValue = 2000;
+                        else giftValue = 5000;
+                    } 
+                    else if (price === 2000) {
+                        if (random < 0.5) giftValue = 2000;
+                        else giftValue = 5000;
+                    }
+                    
+                    const giftName = getGiftNameByValue(giftValue);
+                    const giftIcon = giftValue === 100 ? "fas fa-gift" : 
+                                    giftValue === 500 ? "fas fa-gem" : "fas fa-crown";
+                    const giftColor = giftValue === 100 ? "#4CAF50" : 
+                                     giftValue === 500 ? "#2196F3" : "#9C27B0";
+                    
+                    caseElement.innerHTML = `
+                        <i class="${giftIcon}" style="color: ${giftColor}"></i>
+                        <div class="case-text">${giftName}</div>
+                    `;
+                    
+                    const existingGift = userData.inventory.find(g => g.value === giftValue);
+                    if (existingGift) {
+                        existingGift.quantity += 1;
+                    } else {
+                        userData.inventory.push({
+                            id: userData.inventory.length + 1,
+                            name: giftName,
+                            value: giftValue,
+                            quantity: 1,
+                            icon: giftIcon,
+                            color: giftColor
+                        });
+                    }
+                    
+                    showModal('Поздравляем!', `Вы получили ${giftName.toLowerCase()}!`);
+                    renderInventory();
+                }, 500);
+            }, 500);
+        }
+
+        function showTonPayment(amount) {
+            document.getElementById('ton-amount').value = amount || '';
+            document.getElementById('ton-modal').classList.add('active');
+        }
+
+        function processTonPayment() {
+            const amount = parseInt(document.getElementById('ton-amount').value);
+            
+            if (isNaN(amount) {
+                showModal('Ошибка', 'Введите корректную сумму');
+                return;
+            }
+            
+            userData.balance += amount;
+            updateBalance();
+            closeModal('ton-modal');
+            showModal('Успех', `Баланс пополнен на ${amount} алмазов!`);
+        }
+
         function getGiftNameByValue(value) {
             switch (value) {
                 case 100: return "Обычный подарок";
@@ -442,157 +1165,14 @@
             }
         }
 
-        // Открытие кейса
-        function openCase(price) {
-            if (userData.balance < price) {
-                alert(`Недостаточно алмазов! Нужно ${price} 💎`);
-                return;
-            }
-
-            userData.balance -= price;
-            updateBalance();
-
-            // Определяем вероятность выпадения подарков
-            let giftValue;
-            const random = Math.random();
-
-            if (price === 100) {
-                // Обычный кейс
-                if (random < 0.7) giftValue = 100;   // 70% - обычный
-                else if (random < 0.95) giftValue = 500; // 25% - редкий
-                else giftValue = 2000; // 5% - эпический
-            } else if (price === 500) {
-                // Редкий кейс
-                if (random < 0.6) giftValue = 500;   // 60% - редкий
-                else if (random < 0.9) giftValue = 2000; // 30% - эпический
-                else giftValue = 5000; // 10% - легендарный
-            } else if (price === 2000) {
-                // Эпический кейс
-                if (random < 0.5) giftValue = 2000;  // 50% - эпический
-                else giftValue = 5000; // 50% - легендарный
-            }
-
-            // Добавляем подарок в инвентарь
-            const existingGift = userData.inventory.find(item => item.value === giftValue);
-            if (existingGift) {
-                existingGift.quantity += 1;
-            } else {
-                userData.inventory.push({
-                    id: userData.inventory.length + 1,
-                    name: getGiftNameByValue(giftValue),
-                    value: giftValue,
-                    quantity: 1
-                });
-            }
-
-            alert(`Вы получили ${getGiftNameByValue(giftValue).toLowerCase()}!`);
-            renderInventory();
+        function showModal(title, text) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-text').textContent = text;
+            document.getElementById('result-modal').classList.add('active');
         }
 
-        // Игра в рулетку
-        function playRoulette(price, isTon = false) {
-            if (!isTon && userData.balance < price) {
-                alert(`Недостаточно алмазов! Нужно ${price} 💎`);
-                return;
-            }
-
-            if (isTon) {
-                // Для TON рулетки показываем платежное окно
-                showTonPayment();
-                document.getElementById('ton-amount').value = 5000; // 5 TON = 5000 алмазов
-                alert('Для игры в супер рулетку нужно оплатить 5 TON');
-                return;
-            }
-
-            userData.balance -= price;
-            updateBalance();
-
-            // Вращаем рулетку
-            const prizes = [
-                { value: price * 0.5, text: `${price * 0.5} 💎` },
-                { value: price * 1, text: `${price * 1} 💎` },
-                { value: price * 2, text: `${price * 2} 💎` },
-                { value: price * 5, text: `${price * 5} 💎` },
-                { value: 100, text: "Обычный подарок" },
-                { value: 500, text: "Редкий подарок" }
-            ];
-
-            // Выбираем случайный приз
-            const prizeIndex = Math.floor(Math.random() * prizes.length);
-            const prize = prizes[prizeIndex];
-
-            // Обрабатываем выигрыш
-            if (prize.text.includes('💎')) {
-                userData.balance += prize.value;
-                updateBalance();
-                alert(`Поздравляем! Вы выиграли ${prize.text}`);
-            } else {
-                const giftValue = prize.value;
-                const existingGift = userData.inventory.find(item => item.value === giftValue);
-                if (existingGift) {
-                    existingGift.quantity += 1;
-                } else {
-                    userData.inventory.push({
-                        id: userData.inventory.length + 1,
-                        name: getGiftNameByValue(giftValue),
-                        value: giftValue,
-                        quantity: 1
-                    });
-                }
-                alert(`Поздравляем! Вы выиграли ${prize.text.toLowerCase()}!`);
-                renderInventory();
-            }
-        }
-
-        // Обработка платежа через TON
-        function processTonPayment() {
-            const amountInput = document.getElementById('ton-amount');
-            const errorElement = document.getElementById('ton-error');
-
-            // Проверка ввода
-            let amount;
-            try {
-                amount = parseInt(amountInput.value);
-                if (isNaN(amount) || amount <= 0) {
-                    throw new Error('Введите положительное число');
-                }
-            } catch (e) {
-                errorElement.textContent = 'Ошибка: введите целое положительное число';
-                return;
-            }
-
-            errorElement.textContent = '';
-
-            // Конвертируем алмазы в TON (1 TON = 500 алмазов)
-            const tonAmount = amount / 500;
-
-            // Здесь должна быть интеграция с TON Wallet
-            // В демо-версии просто добавляем алмазы
-            userData.balance += amount;
-            updateBalance();
-
-            alert(`Баланс пополнен на ${amount} алмазов (${tonAmount.toFixed(2)} TON)`);
-            backToDeposit();
-
-            // В реальном приложении здесь будет вызов Telegram.WebApp.openInvoice
-            /*
-            const invoice = {
-                amount: tonAmount * 1000000000, // в нанотонах
-                currency: 'TON',
-                description: `Пополнение на ${amount} алмазов`
-            };
-
-            Telegram.WebApp.openInvoice(invoice, function(status) {
-                if (status === 'paid') {
-                    userData.balance += amount;
-                    updateBalance();
-                    alert(`Баланс пополнен на ${amount} алмазов!`);
-                    backToDeposit();
-                } else {
-                    alert('Платеж не был завершен');
-                }
-            });
-            */
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
     </script>
 </body>

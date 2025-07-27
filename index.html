@@ -411,6 +411,67 @@
             background: #ff45ff;
             transform: translateY(-2px);
         }
+
+        .gifts-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .gift-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .gift-item i {
+            font-size: 30px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .gift-item .gift-name {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .gift-item .gift-quantity {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .send-gift-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .send-gift-btn:hover {
+            background: #ff45ff;
+        }
+
+        .gift-preview {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -468,6 +529,42 @@
                     Рулетка
                 </div>
                 <div class="menu-button" data-section="main-section">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </div>
+            </div>
+        </div>
+
+        <div id="gifts-section" class="section">
+            <h2>🎁 Мои подарки</h2>
+            <div class="gifts-container" id="gifts-container">
+                <!-- Подарки будут загружены здесь -->
+            </div>
+            
+            <div class="menu">
+                <div class="menu-button" data-section="send-gift-section">
+                    <i class="fas fa-paper-plane"></i>
+                    Отправить подарок
+                </div>
+                <div class="menu-button" data-section="main-section">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </div>
+            </div>
+        </div>
+
+        <div id="send-gift-section" class="section">
+            <h2>💝 Отправить подарок</h2>
+            <div class="gifts-container" id="send-gifts-container">
+                <!-- Подарки для отправки будут здесь -->
+            </div>
+            
+            <div class="menu">
+                <div class="menu-button" id="select-recipient-btn">
+                    <i class="fas fa-user-friends"></i>
+                    Выбрать получателя
+                </div>
+                <div class="menu-button" data-section="gifts-section">
                     <i class="fas fa-arrow-left"></i>
                     Назад
                 </div>
@@ -562,8 +659,8 @@
         <button class="nav-button" data-section="games-section">
             <i class="fas fa-gamepad"></i>
         </button>
-        <button class="nav-button" data-section="cases-section">
-            <i class="fas fa-box-open"></i>
+        <button class="nav-button" data-section="gifts-section">
+            <i class="fas fa-gift"></i>
         </button>
         <button class="nav-button" data-section="roulette-section">
             <i class="fas fa-dharmachakra"></i>
@@ -579,6 +676,43 @@
             <div id="modal-content" style="text-align: center; padding: 20px 0;"></div>
             <button class="submit-button" id="modal-close-btn">
                 Закрыть
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="recipient-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-recipient-modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="modal-title">Выберите получателя</h3>
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="recipient-search" placeholder="Поиск по ID или имени" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.1); color: white;">
+            </div>
+            <div id="recipient-list" style="max-height: 300px; overflow-y: auto;">
+                <!-- Список пользователей будет здесь -->
+            </div>
+            <button class="submit-button" id="confirm-send-gift">
+                Отправить подарок
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="gift-preview-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-gift-preview">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="modal-title" id="gift-preview-title">Подарок</h3>
+            <div class="gift-preview" id="gift-preview-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <div id="gift-preview-name" style="font-size: 1.2em; margin-bottom: 5px;"></div>
+                <div id="gift-preview-value" style="opacity: 0.8;"></div>
+            </div>
+            <button class="submit-button" id="send-gift-confirm">
+                Отправить
             </button>
         </div>
     </div>
@@ -600,7 +734,14 @@
             isSpinning: false,
             currentCasePrize: null,
             selectedGifts: [],
-            caseAnimation: null
+            caseAnimation: null,
+            selectedRecipient: null,
+            selectedGiftForSending: null,
+            friends: [
+                { id: 123456, first_name: "Алексей", last_name: "Петров", username: "alex_petrov" },
+                { id: 654321, first_name: "Мария", last_name: "Иванова", username: "maria_ivanova" },
+                { id: 789012, first_name: "Иван", last_name: "Сидоров", username: "ivan_sidorov" }
+            ]
         };
 
         // Цвета для колеса рулетки
@@ -637,6 +778,8 @@
             initWheel();
             initUpgradeWheel();
             setupEventListeners();
+            renderGifts();
+            renderSendGifts();
         });
 
         function initUserData() {
@@ -691,6 +834,204 @@
             // Модальное окно
             document.getElementById('close-modal').addEventListener('click', () => closeModal('result-modal'));
             document.getElementById('modal-close-btn').addEventListener('click', () => closeModal('result-modal'));
+            
+            // Выбор получателя подарка
+            document.getElementById('select-recipient-btn').addEventListener('click', showRecipientModal);
+            document.getElementById('close-recipient-modal').addEventListener('click', () => closeModal('recipient-modal'));
+            document.getElementById('confirm-send-gift').addEventListener('click', confirmSendGift);
+            
+            // Поиск получателей
+            document.getElementById('recipient-search').addEventListener('input', searchRecipients);
+            
+            // Превью подарка
+            document.getElementById('close-gift-preview').addEventListener('click', () => closeModal('gift-preview-modal'));
+            document.getElementById('send-gift-confirm').addEventListener('click', sendGiftToRecipient);
+        }
+
+        function renderGifts() {
+            const container = document.getElementById('gifts-container');
+            container.innerHTML = '';
+            
+            state.inventory.forEach(gift => {
+                if (gift.quantity > 0) {
+                    const giftElement = document.createElement('div');
+                    giftElement.className = 'gift-item';
+                    giftElement.innerHTML = `
+                        <i class="${gift.icon}" style="color: ${gift.color}"></i>
+                        <div class="gift-name">${gift.name}</div>
+                        <div class="gift-quantity">Количество: ${gift.quantity}</div>
+                        <button class="send-gift-btn" data-gift-id="${gift.id}">
+                            Отправить
+                        </button>
+                    `;
+                    
+                    giftElement.querySelector('.send-gift-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectGiftForSending(gift.id);
+                    });
+                    
+                    container.appendChild(giftElement);
+                }
+            });
+            
+            if (container.children.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">У вас пока нет подарков</p>';
+            }
+        }
+
+        function renderSendGifts() {
+            const container = document.getElementById('send-gifts-container');
+            container.innerHTML = '';
+            
+            state.inventory.forEach(gift => {
+                if (gift.quantity > 0) {
+                    const giftElement = document.createElement('div');
+                    giftElement.className = 'gift-item';
+                    giftElement.innerHTML = `
+                        <i class="${gift.icon}" style="color: ${gift.color}"></i>
+                        <div class="gift-name">${gift.name}</div>
+                        <div class="gift-quantity">Количество: ${gift.quantity}</div>
+                        <button class="send-gift-btn" data-gift-id="${gift.id}">
+                            Выбрать
+                        </button>
+                    `;
+                    
+                    giftElement.querySelector('.send-gift-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectGiftForSending(gift.id);
+                    });
+                    
+                    container.appendChild(giftElement);
+                }
+            });
+            
+            if (container.children.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">У вас пока нет подарков</p>';
+            }
+        }
+
+        function selectGiftForSending(giftId) {
+            const gift = state.inventory.find(g => g.id === giftId);
+            if (!gift) return;
+            
+            state.selectedGiftForSending = gift;
+            
+            // Показываем превью подарка
+            document.getElementById('gift-preview-title').textContent = 'Отправить подарок';
+            document.getElementById('gift-preview-name').textContent = gift.name;
+            document.getElementById('gift-preview-value').textContent = `Стоимость: ${gift.value} 💎`;
+            document.getElementById('gift-preview-icon').innerHTML = `<i class="${gift.icon}" style="color: ${gift.color}; font-size: 50px;"></i>`;
+            
+            // Если получатель уже выбран, сразу предлагаем отправить
+            if (state.selectedRecipient) {
+                document.getElementById('send-gift-confirm').style.display = 'block';
+                document.getElementById('send-gift-confirm').textContent = `Отправить ${gift.name.toLowerCase()} ${state.selectedRecipient.first_name}`;
+            } else {
+                document.getElementById('send-gift-confirm').style.display = 'none';
+            }
+            
+            openModal('gift-preview-modal');
+        }
+
+        function showRecipientModal() {
+            if (!state.selectedGiftForSending) {
+                showModal('Ошибка', 'Сначала выберите подарок для отправки');
+                return;
+            }
+            
+            const container = document.getElementById('recipient-list');
+            container.innerHTML = '';
+            
+            state.friends.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'menu-button';
+                friendElement.style.marginBottom = '8px';
+                friendElement.style.padding = '10px';
+                friendElement.style.display = 'flex';
+                friendElement.style.alignItems = 'center';
+                friendElement.innerHTML = `
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}; 
+                                display: flex; align-items: center; justify-content: center; margin-right: 10px; color: white; font-weight: bold;">
+                        ${friend.first_name[0]}
+                    </div>
+                    <div style="flex: 1;">
+                        <div>${friend.first_name} ${friend.last_name || ''}</div>
+                        <div style="font-size: 0.8em; opacity: 0.7;">@${friend.username || 'нет'}</div>
+                    </div>
+                `;
+                
+                friendElement.addEventListener('click', () => {
+                    state.selectedRecipient = friend;
+                    document.querySelectorAll('#recipient-list .menu-button').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                    friendElement.classList.add('active');
+                });
+                
+                container.appendChild(friendElement);
+            });
+            
+            openModal('recipient-modal');
+        }
+
+        function searchRecipients() {
+            const searchTerm = document.getElementById('recipient-search').value.toLowerCase();
+            const friends = document.querySelectorAll('#recipient-list .menu-button');
+            
+            friends.forEach(friend => {
+                const name = friend.textContent.toLowerCase();
+                if (name.includes(searchTerm)) {
+                    friend.style.display = 'flex';
+                } else {
+                    friend.style.display = 'none';
+                }
+            });
+        }
+
+        function confirmSendGift() {
+            if (!state.selectedRecipient) {
+                showModal('Ошибка', 'Выберите получателя');
+                return;
+            }
+            
+            closeModal('recipient-modal');
+            
+            // Обновляем превью подарка с выбранным получателем
+            document.getElementById('send-gift-confirm').style.display = 'block';
+            document.getElementById('send-gift-confirm').textContent = 
+                `Отправить ${state.selectedGiftForSending.name.toLowerCase()} ${state.selectedRecipient.first_name}`;
+        }
+
+        function sendGiftToRecipient() {
+            if (!state.selectedGiftForSending || !state.selectedRecipient) {
+                showModal('Ошибка', 'Выберите подарок и получателя');
+                return;
+            }
+            
+            // Уменьшаем количество подарков
+            const gift = state.inventory.find(g => g.id === state.selectedGiftForSending.id);
+            if (gift) {
+                gift.quantity -= 1;
+                if (gift.quantity <= 0) {
+                    state.inventory = state.inventory.filter(g => g.id !== gift.id);
+                }
+            }
+            
+            // Здесь можно добавить логику отправки подарка через Telegram API
+            // Например, используя tg.sendData или tg.openTelegramLink
+            
+            // Показываем уведомление об успешной отправке
+            showModal('Подарок отправлен', 
+                `Вы отправили ${gift.name.toLowerCase()} пользователю ${state.selectedRecipient.first_name} ${state.selectedRecipient.last_name || ''}`);
+            
+            // Обновляем интерфейс
+            renderGifts();
+            renderSendGifts();
+            closeModal('gift-preview-modal');
+            
+            // Сбрасываем выбор
+            state.selectedGiftForSending = null;
+            state.selectedRecipient = null;
         }
 
         function showSection(sectionId) {
@@ -709,7 +1050,7 @@
             const navMap = {
                 'main-section': 1,
                 'games-section': 2,
-                'cases-section': 3,
+                'gifts-section': 3,
                 'roulette-section': 4
             };
 
@@ -717,6 +1058,12 @@
             if (btnIndex) {
                 const navBtn = document.querySelector(`.nav-button:nth-child(${btnIndex})`);
                 if (navBtn) navBtn.classList.add('active');
+            }
+            
+            // При открытии раздела с подарками обновляем список
+            if (sectionId === 'gifts-section' || sectionId === 'send-gift-section') {
+                renderGifts();
+                renderSendGifts();
             }
         }
 
@@ -833,6 +1180,8 @@
                 }
 
                 message = `Вы выиграли ${gift.name.toLowerCase()}!`;
+                renderGifts();
+                renderSendGifts();
             }
             else {
                 message = "К сожалению, вы ничего не выиграли. Попробуйте ещё раз!";
@@ -909,6 +1258,8 @@
 
             showModal('Апгрейд', `Вы получили 1 ${getGiftNameByValue(newGiftValue).toLowerCase()}!`);
             initUpgradeWheel();
+            renderGifts();
+            renderSendGifts();
         }
 
         function openCase(price) {
@@ -973,6 +1324,9 @@
                     showModal('Поздравляем!', `Вы получили ${state.currentCasePrize.name.toLowerCase()}!`);
                     state.isSpinning = false;
                     state.currentCasePrize = null;
+                    
+                    renderGifts();
+                    renderSendGifts();
                 }, 3000);
             }, 50);
         }
@@ -1015,7 +1369,11 @@
         function showModal(title, content) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-content').innerHTML = content;
-            document.getElementById('result-modal').classList.add('active');
+            openModal('result-modal');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
         }
 
         function closeModal(modalId) {

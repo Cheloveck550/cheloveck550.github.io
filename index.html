@@ -49,7 +49,6 @@
             box-shadow: var(--glass-shadow);
         }
 
-        /* Стили профиля */
         .profile-card {
             background: var(--profile-bg);
             backdrop-filter: blur(10px);
@@ -196,7 +195,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Обновленные стили для колеса фортуны */
         .wheel-container {
             position: relative;
             width: 300px;
@@ -268,7 +266,6 @@
             z-index: 5;
         }
 
-        /* Анимация колеса */
         @keyframes spin {
             0% { transform: rotate(0); }
             100% { transform: rotate(360deg); }
@@ -278,13 +275,11 @@
             animation: spin 0.1s linear infinite;
         }
 
-        /* Подсветка выигрышного сектора */
         .winning-sector {
             box-shadow: inset 0 0 20px gold, 0 0 20px gold;
             transition: box-shadow 0.5s ease;
         }
 
-        /* Анимация кейсов */
         .case-animation {
             position: relative;
             height: 200px;
@@ -295,9 +290,9 @@
         .case-track {
             display: flex;
             position: absolute;
-            left: 50%;
+            left: 0;
             top: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateY(-50%);
             transition: transform 3s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
 
@@ -342,7 +337,6 @@
             z-index: 10;
         }
 
-        /* Модальное окно */
         .modal {
             position: fixed;
             top: 0;
@@ -426,7 +420,6 @@
             <h1>🎁 Gifts App</h1>
         </div>
 
-        <!-- Профиль пользователя -->
         <div class="profile-card">
             <div class="avatar" id="user-avatar">U</div>
             <div class="profile-info">
@@ -438,134 +431,123 @@
             </div>
         </div>
 
-        <!-- Главный экран -->
         <div id="main-section" class="section active">
             <div class="menu">
-                <div class="menu-button" onclick="showSection('games-section')">
+                <div class="menu-button" data-section="games-section">
                     <i class="fas fa-gamepad"></i>
                     Мини-игры
                 </div>
-                <div class="menu-button" onclick="showSection('gifts-section')">
+                <div class="menu-button" data-section="gifts-section">
                     <i class="fas fa-gift"></i>
                     Подарки
                 </div>
-                <div class="menu-button" onclick="showSection('cases-section')">
+                <div class="menu-button" data-section="cases-section">
                     <i class="fas fa-box-open"></i>
                     Кейсы
                 </div>
-                <div class="menu-button" onclick="showSection('roulette-section')">
+                <div class="menu-button" data-section="roulette-section">
                     <i class="fas fa-dharmachakra"></i>
                     Рулетка
                 </div>
             </div>
         </div>
 
-        <!-- Экран мини-игр -->
         <div id="games-section" class="section">
             <h2>🎮 Мини-игры</h2>
             <div class="menu">
-                <div class="menu-button" onclick="showUpgradeWheel()">
+                <div class="menu-button" data-section="upgrade-wheel-section">
                     <i class="fas fa-sync-alt"></i>
                     Апгрейд
                 </div>
-                <div class="menu-button" onclick="showSection('cases-section')">
+                <div class="menu-button" data-section="cases-section">
                     <i class="fas fa-box-open"></i>
                     Кейсы
                 </div>
-                <div class="menu-button" onclick="showSection('roulette-section')">
+                <div class="menu-button" data-section="roulette-section">
                     <i class="fas fa-dharmachakra"></i>
                     Рулетка
                 </div>
-                <div class="menu-button" onclick="showSection('main-section')">
+                <div class="menu-button" data-section="main-section">
                     <i class="fas fa-arrow-left"></i>
                     Назад
                 </div>
             </div>
         </div>
 
-        <!-- Экран кейсов -->
         <div id="cases-section" class="section">
             <h2>🎲 Кейсы</h2>
 
             <div class="case-animation">
-                <div class="case-track" id="case-track">
-                    <!-- Анимированные кейсы будут здесь -->
-                </div>
+                <div class="case-track" id="case-track"></div>
                 <div class="case-pointer"></div>
             </div>
 
             <div class="menu">
-                <div class="menu-button" onclick="openCase(100)">
+                <div class="menu-button" data-case="100">
                     <i class="fas fa-box"></i>
                     Обычный (100💎)
                 </div>
-                <div class="menu-button" onclick="openCase(500)">
+                <div class="menu-button" data-case="500">
                     <i class="fas fa-box-open"></i>
                     Редкий (500💎)
                 </div>
-                <div class="menu-button" onclick="openCase(2000)">
+                <div class="menu-button" data-case="2000">
                     <i class="fas fa-gem"></i>
                     Эпический (2000💎)
                 </div>
-                <div class="menu-button" onclick="showSection('games-section')">
+                <div class="menu-button" data-section="games-section">
                     <i class="fas fa-arrow-left"></i>
                     Назад
                 </div>
             </div>
         </div>
 
-        <!-- Экран рулетки -->
         <div id="roulette-section" class="section">
             <h2>🎡 Рулетка</h2>
 
             <div class="wheel-container">
                 <div class="wheel-arrow"></div>
-                <div class="wheel" id="wheel">
-                    <!-- Секции колеса будут добавлены через JS -->
-                </div>
-                <div class="wheel-center" onclick="startSpin()">Крутить</div>
+                <div class="wheel" id="wheel"></div>
+                <div class="wheel-center" id="spin-wheel">Крутить</div>
             </div>
 
             <div class="menu">
-                <div class="menu-button" onclick="setBet(100)">
+                <div class="menu-button" data-bet="100">
                     <i class="fas fa-coins"></i>
                     100💎
                 </div>
-                <div class="menu-button" onclick="setBet(500)">
+                <div class="menu-button" data-bet="500">
                     <i class="fas fa-star"></i>
                     500💎
                 </div>
-                <div class="menu-button" onclick="setBet(1000, true)">
+                <div class="menu-button" data-bet="1000" data-ton="true">
                     <i class="fab fa-telegram"></i>
                     5 TON
                 </div>
-                <div class="menu-button" onclick="showSection('games-section')">
+                <div class="menu-button" data-section="games-section">
                     <i class="fas fa-arrow-left"></i>
                     Назад
                 </div>
             </div>
         </div>
 
-        <!-- Экран апгрейда через колесо -->
         <div id="upgrade-wheel-section" class="section">
             <h2>🔄 Апгрейд подарков</h2>
 
             <div class="wheel-container">
                 <div class="wheel-arrow"></div>
-                <div class="wheel" id="upgrade-wheel">
-                    <!-- Секции колеса апгрейда будут добавлены через JS -->
-                </div>
-                <div class="wheel-center" onclick="spinUpgradeWheel()">Апгрейд</div>
+                <div class="wheel" id="upgrade-wheel"></div>
+                <div class="wheel-center" id="spin-upgrade">Апгрейд</div>
             </div>
 
             <p style="text-align: center; margin: 20px 0;">Выберите 3 подарка для апгрейда</p>
 
             <div class="menu">
-                <div class="menu-button" onclick="spinUpgradeWheel()">
+                <div class="menu-button" id="start-upgrade">
                     <i class="fas fa-random"></i>
                     Крутить
                 </div>
-                <div class="menu-button" onclick="showSection('games-section')">
+                <div class="menu-button" data-section="games-section">
                     <i class="fas fa-arrow-left"></i>
                     Назад
                 </div>
@@ -573,33 +555,29 @@
         </div>
     </div>
 
-    <!-- Нижняя навигационная панель -->
     <div class="nav-bar">
-        <button class="nav-button active" onclick="showSection('main-section')">
+        <button class="nav-button active" data-section="main-section">
             <i class="fas fa-home"></i>
         </button>
-        <button class="nav-button" onclick="showSection('games-section')">
+        <button class="nav-button" data-section="games-section">
             <i class="fas fa-gamepad"></i>
         </button>
-        <button class="nav-button" onclick="showSection('cases-section')">
+        <button class="nav-button" data-section="cases-section">
             <i class="fas fa-box-open"></i>
         </button>
-        <button class="nav-button" onclick="showSection('roulette-section')">
+        <button class="nav-button" data-section="roulette-section">
             <i class="fas fa-dharmachakra"></i>
         </button>
     </div>
 
-    <!-- Модальное окно для результатов -->
     <div class="modal" id="result-modal">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('result-modal')">
+            <button class="modal-close" id="close-modal">
                 <i class="fas fa-times"></i>
             </button>
             <h3 class="modal-title" id="modal-title">Поздравляем!</h3>
-            <div id="modal-content" style="text-align: center; padding: 20px 0;">
-                <!-- Контент модального окна -->
-            </div>
-            <button class="submit-button" onclick="closeModal('result-modal')">
+            <div id="modal-content" style="text-align: center; padding: 20px 0;"></div>
+            <button class="submit-button" id="modal-close-btn">
                 Закрыть
             </button>
         </div>
@@ -610,18 +588,19 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Имитация данных пользователя
-        let userData = {
+        // Состояние приложения
+        const state = {
             balance: 1000,
             inventory: [
                 { id: 1, name: "Обычный подарок", value: 100, quantity: 5, icon: "fas fa-gift", color: "#4CAF50" },
                 { id: 2, name: "Редкий подарок", value: 500, quantity: 2, icon: "fas fa-gem", color: "#2196F3" },
                 { id: 3, name: "Эпический подарок", value: 2000, quantity: 1, icon: "fas fa-crown", color: "#9C27B0" }
             ],
-            selectedGifts: [],
             currentBet: 100,
             isSpinning: false,
-            currentCasePrize: null
+            currentCasePrize: null,
+            selectedGifts: [],
+            caseAnimation: null
         };
 
         // Цвета для колеса рулетки
@@ -644,7 +623,7 @@
             { type: "gift", value: 500, text: "Редкий", icon: "fas fa-gem" }
         ];
 
-        // Возможные призы для кейсов
+        // Призы для кейсов
         const casePrizes = [
             { value: 100, name: "Обычный подарок", icon: "fas fa-gift", color: "#4CAF50" },
             { value: 500, name: "Редкий подарок", icon: "fas fa-gem", color: "#2196F3" },
@@ -654,79 +633,96 @@
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            // Установка данных пользователя из Telegram
+            initUserData();
+            initWheel();
+            initUpgradeWheel();
+            setupEventListeners();
+        });
+
+        function initUserData() {
             if (tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 document.getElementById('username').textContent = user.first_name || 'Пользователь';
                 document.getElementById('user-id').textContent = user.id;
                 
-                // Создаем аватар из первой буквы имени
                 const avatar = document.getElementById('user-avatar');
                 avatar.textContent = user.first_name ? user.first_name[0].toUpperCase() : 'U';
                 
-                // Цвет аватара на основе ID пользователя
                 const colors = ['#4a8cff', '#ff6b6b', '#6bceff', '#a78bfa', '#66d9e8'];
-                const colorIndex = user.id % colors.length;
-                avatar.style.backgroundColor = colors[colorIndex];
+                avatar.style.backgroundColor = colors[user.id % colors.length];
             }
             
             updateBalance();
-            initWheel();
-            initUpgradeWheel();
-        });
-
-        // Обновление баланса
-        function updateBalance() {
-            document.getElementById('balance').textContent = userData.balance;
         }
 
-        // Навигация по разделам
+        function updateBalance() {
+            document.getElementById('balance').textContent = state.balance;
+        }
+
+        function setupEventListeners() {
+            // Навигация по разделам
+            document.querySelectorAll('[data-section]').forEach(btn => {
+                btn.addEventListener('click', () => showSection(btn.dataset.section));
+            });
+
+            // Кнопки кейсов
+            document.querySelectorAll('[data-case]').forEach(btn => {
+                btn.addEventListener('click', () => openCase(parseInt(btn.dataset.case)));
+            });
+
+            // Кнопки ставок рулетки
+            document.querySelectorAll('[data-bet]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.currentBet = parseInt(btn.dataset.bet);
+                    if (btn.dataset.ton === 'true') {
+                        showModal('TON оплата', 'Для игры нужно оплатить 5 TON через TON Wallet');
+                    } else {
+                        startSpin();
+                    }
+                });
+            });
+
+            // Кнопка вращения рулетки
+            document.getElementById('spin-wheel').addEventListener('click', startSpin);
+
+            // Кнопка апгрейда
+            document.getElementById('start-upgrade').addEventListener('click', spinUpgradeWheel);
+
+            // Модальное окно
+            document.getElementById('close-modal').addEventListener('click', () => closeModal('result-modal'));
+            document.getElementById('modal-close-btn').addEventListener('click', () => closeModal('result-modal'));
+        }
+
         function showSection(sectionId) {
-            // Скрыть все разделы
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
 
-            // Показать выбранный раздел
-            document.getElementById(sectionId).classList.add('active');
+            const section = document.getElementById(sectionId);
+            if (section) section.classList.add('active');
 
-            // Обновить активную кнопку в навигации
+            // Обновление активной кнопки навигации
             document.querySelectorAll('.nav-button').forEach(btn => {
                 btn.classList.remove('active');
             });
 
-            // Установить соответствующую кнопку активной
-            if (sectionId === 'main-section') {
-                document.querySelector('.nav-button:nth-child(1)').classList.add('active');
-            } else if (sectionId === 'games-section') {
-                document.querySelector('.nav-button:nth-child(2)').classList.add('active');
-            } else if (sectionId === 'cases-section') {
-                document.querySelector('.nav-button:nth-child(3)').classList.add('active');
-            } else if (sectionId === 'roulette-section') {
-                document.querySelector('.nav-button:nth-child(4)').classList.add('active');
+            const navMap = {
+                'main-section': 1,
+                'games-section': 2,
+                'cases-section': 3,
+                'roulette-section': 4
+            };
+
+            const btnIndex = navMap[sectionId];
+            if (btnIndex) {
+                const navBtn = document.querySelector(`.nav-button:nth-child(${btnIndex})`);
+                if (navBtn) navBtn.classList.add('active');
             }
         }
 
-        // Показать колесо апгрейда
-        function showUpgradeWheel() {
-            showSection('upgrade-wheel-section');
-        }
-
-        // Установка ставки для рулетки
-        function setBet(bet, isTon = false) {
-            userData.currentBet = bet;
-            if (isTon) {
-                showModal('TON оплата', 'Для игры нужно оплатить 5 TON через TON Wallet');
-            } else {
-                startSpin();
-            }
-        }
-
-        // Инициализация колеса рулетки
         function initWheel() {
             const wheel = document.getElementById('wheel');
             wheel.innerHTML = '';
-            wheel.style.transform = 'rotate(0deg)';
 
             const sectionAngle = 360 / roulettePrizes.length;
 
@@ -745,12 +741,11 @@
             });
         }
 
-        // Инициализация колеса апгрейда
         function initUpgradeWheel() {
             const wheel = document.getElementById('upgrade-wheel');
             wheel.innerHTML = '';
 
-            const gifts = userData.inventory.filter(g => g.quantity > 0);
+            const gifts = state.inventory.filter(g => g.quantity > 0);
             if (gifts.length === 0) return;
 
             const sectionAngle = 360 / gifts.length;
@@ -770,67 +765,59 @@
             });
         }
 
-        // Запуск вращения рулетки
         function startSpin() {
-            if (userData.isSpinning) return;
+            if (state.isSpinning) return;
             
-            if (userData.balance < userData.currentBet) {
+            if (state.balance < state.currentBet) {
                 showModal('Ошибка', 'Недостаточно алмазов!');
                 return;
             }
 
-            userData.isSpinning = true;
-            userData.balance -= userData.currentBet;
+            state.isSpinning = true;
+            state.balance -= state.currentBet;
             updateBalance();
 
             const wheel = document.getElementById('wheel');
-            const spinDuration = 4000; // 4 секунды анимации
-            const spins = 5; // Количество полных оборотов
+            const spinDuration = 4000;
+            const spins = 5;
             
-            // Случайный угол остановки (смещение на половину сектора для точного попадания в стрелку)
+            // Рассчитываем точный угол остановки для стрелки
             const sectionAngle = 360 / roulettePrizes.length;
             const winningIndex = Math.floor(Math.random() * roulettePrizes.length);
-            const randomAngle = winningIndex * sectionAngle + sectionAngle/2;
+            const stopAngle = spins * 360 + winningIndex * sectionAngle + sectionAngle/2;
+
+            // Сброс перед началом анимации
+            wheel.style.transition = 'none';
+            wheel.style.transform = 'rotate(0deg)';
             
-            const totalRotation = spins * 360 + randomAngle; // Общий угол поворота
-
-            // Добавляем класс для анимации вращения
-            wheel.classList.add('spinning');
-
-            // Через небольшой промежуток времени запускаем плавную остановку
             setTimeout(() => {
-                wheel.classList.remove('spinning');
-                wheel.style.transform = `rotate(${-totalRotation}deg)`;
+                wheel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.17, 0.67, 0.12, 0.99)`;
+                wheel.style.transform = `rotate(-${stopAngle}deg)`;
 
-                // После завершения анимации определяем выигрыш
                 setTimeout(() => {
                     const prize = roulettePrizes[winningIndex];
-
-                    // Подсвечиваем выигравший сектор
                     const sections = document.querySelectorAll('.wheel-section');
                     sections[winningIndex].classList.add('winning-sector');
 
-                    // Через 1 секунду обрабатываем выигрыш
                     setTimeout(() => {
                         sections[winningIndex].classList.remove('winning-sector');
                         processPrize(prize);
-                        userData.isSpinning = false;
+                        state.isSpinning = false;
                     }, 1000);
                 }, spinDuration);
-            }, 100);
+            }, 10);
         }
 
-        // Обработка выигрыша
         function processPrize(prize) {
             let message = '';
 
             if (prize.type === 'diamonds') {
-                userData.balance += prize.value;
+                state.balance += prize.value;
                 message = `Вы выиграли ${prize.value} алмазов!`;
             }
             else if (prize.type === 'gift') {
                 const gift = {
-                    id: userData.inventory.length + 1,
+                    id: state.inventory.length + 1,
                     name: prize.value === 100 ? "Обычный подарок" : "Редкий подарок",
                     value: prize.value,
                     quantity: 1,
@@ -838,11 +825,11 @@
                     color: prize.value === 100 ? "#4CAF50" : "#2196F3"
                 };
 
-                const existingGift = userData.inventory.find(g => g.value === gift.value);
+                const existingGift = state.inventory.find(g => g.value === gift.value);
                 if (existingGift) {
                     existingGift.quantity += 1;
                 } else {
-                    userData.inventory.push(gift);
+                    state.inventory.push(gift);
                 }
 
                 message = `Вы выиграли ${gift.name.toLowerCase()}!`;
@@ -855,9 +842,8 @@
             showModal('Результат', message);
         }
 
-        // Вращение колеса апгрейда
         function spinUpgradeWheel() {
-            const gifts = userData.inventory.filter(g => g.quantity > 0);
+            const gifts = state.inventory.filter(g => g.quantity > 0);
             if (gifts.length < 3) {
                 showModal('Ошибка', 'Для апгрейда нужно минимум 3 подарка');
                 return;
@@ -869,56 +855,50 @@
             const randomAngle = Math.floor(Math.random() * 360);
             const totalRotation = spins * 360 + randomAngle;
 
-            wheel.style.transform = `rotate(${-totalRotation}deg)`;
+            wheel.style.transform = `rotate(-${totalRotation}deg)`;
 
             setTimeout(() => {
                 const sectionAngle = 360 / gifts.length;
-                const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360 / sectionAngle);
+                const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360 / sectionAngle));
                 const selectedGift = gifts[winningIndex];
 
-                userData.selectedGifts.push(selectedGift);
+                state.selectedGifts.push(selectedGift);
 
-                if (userData.selectedGifts.length < 3) {
-                    showModal('Выбор подарка', `Вы выбрали ${selectedGift.name}. Выберите ещё ${3 - userData.selectedGifts.length} подарка.`);
+                if (state.selectedGifts.length < 3) {
+                    showModal('Выбор подарка', `Вы выбрали ${selectedGift.name}. Выберите ещё ${3 - state.selectedGifts.length} подарка.`);
                 } else {
                     processUpgrade();
-                    userData.selectedGifts = [];
+                    state.selectedGifts = [];
                 }
             }, spinDuration);
         }
 
-        // Апгрейд подарков
         function processUpgrade() {
-            // Находим минимальную ценность среди выбранных подарков
-            const minValue = Math.min(...userData.selectedGifts.map(g => g.value));
+            const minValue = Math.min(...state.selectedGifts.map(g => g.value));
 
-            // Уменьшаем количество выбранных подарков
-            userData.selectedGifts.forEach(selected => {
-                const gift = userData.inventory.find(g => g.id === selected.id);
+            state.selectedGifts.forEach(selected => {
+                const gift = state.inventory.find(g => g.id === selected.id);
                 if (gift) gift.quantity -= 1;
             });
 
-            // Создаем новый подарок с большей ценностью
             let newGiftValue;
             switch (minValue) {
                 case 100: newGiftValue = 500; break;
                 case 500: newGiftValue = 2000; break;
                 case 2000: newGiftValue = 5000; break;
                 default:
-                    // Если это уже максимальный подарок, возвращаем алмазы
-                    userData.balance += minValue * 3;
+                    state.balance += minValue * 3;
                     updateBalance();
                     showModal('Апгрейд', `Вы получили ${minValue * 3} 💎 за 3 подарка!`);
                     return;
             }
 
-            // Проверяем, есть ли уже такой подарок в инвентаре
-            const existingGift = userData.inventory.find(g => g.value === newGiftValue);
+            const existingGift = state.inventory.find(g => g.value === newGiftValue);
             if (existingGift) {
                 existingGift.quantity += 1;
             } else {
-                userData.inventory.push({
-                    id: userData.inventory.length + 1,
+                state.inventory.push({
+                    id: state.inventory.length + 1,
                     name: getGiftNameByValue(newGiftValue),
                     value: newGiftValue,
                     quantity: 1,
@@ -931,94 +911,97 @@
             initUpgradeWheel();
         }
 
-        // Открытие кейса с анимацией
         function openCase(price) {
-            if (userData.balance < price) {
+            if (state.isSpinning) return;
+            
+            if (state.balance < price) {
                 showModal('Ошибка', `Недостаточно алмазов! Нужно ${price} 💎`);
                 return;
             }
 
-            userData.balance -= price;
+            state.isSpinning = true;
+            state.balance -= price;
             updateBalance();
 
             const caseTrack = document.getElementById('case-track');
             caseTrack.innerHTML = '';
-            caseTrack.style.transform = 'translate(-50%, -50%)';
+            caseTrack.style.transition = 'none';
+            caseTrack.style.transform = 'translateX(0)';
 
-            // Определяем возможные призы для этого кейса
-            let possiblePrizes = [];
-            if (price === 100) {
-                possiblePrizes = [
-                    casePrizes[0], casePrizes[0], casePrizes[0], casePrizes[0], casePrizes[0], // 80% обычный
-                    casePrizes[1], casePrizes[1], // 15% редкий
-                    casePrizes[2] // 5% эпический
-                ];
-            } else if (price === 500) {
-                possiblePrizes = [
-                    casePrizes[1], casePrizes[1], casePrizes[1], // 60% редкий
-                    casePrizes[2], casePrizes[2], // 30% эпический
-                    casePrizes[3] // 10% легендарный
-                ];
-            } else if (price === 2000) {
-                possiblePrizes = [
-                    casePrizes[2], casePrizes[2], // 50% эпический
-                    casePrizes[3] // 50% легендарный
-                ];
-            }
+            // Определяем возможные призы
+            const possiblePrizes = getPossiblePrizes(price);
+            state.currentCasePrize = getRandomPrize(possiblePrizes);
 
-            // Выбираем случайный приз из возможных
-            userData.currentCasePrize = possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
+            // Создаем трек
+            const trackLength = 50;
+            const winnerIndex = 25;
             
-            // Создаем трек с призами для анимации
-            const trackLength = 50; // Количество призов в треке
-            const winnerIndex = 25; // Фиксированная позиция выигрыша (середина)
-            
-            // Заполняем трек призами
             for (let i = 0; i < trackLength; i++) {
-                const prize = i === winnerIndex ? userData.currentCasePrize : casePrizes[Math.floor(Math.random() * casePrizes.length)];
+                const prize = i === winnerIndex ? state.currentCasePrize : 
+                    casePrizes[Math.floor(Math.random() * casePrizes.length)];
                 
                 const caseItem = document.createElement('div');
                 caseItem.className = 'case-item';
                 if (i === winnerIndex) caseItem.classList.add('winner');
-                caseItem.innerHTML = `
-                    <i class="${prize.icon}" style="color: ${prize.color}"></i>
-                `;
+                caseItem.innerHTML = `<i class="${prize.icon}" style="color: ${prize.color}"></i>`;
                 caseTrack.appendChild(caseItem);
             }
 
-            // Анимация прокрутки трека
+            // Запускаем анимацию
             setTimeout(() => {
-                const trackWidth = caseTrack.offsetWidth;
-                const containerWidth = document.querySelector('.case-animation').offsetWidth;
                 const itemWidth = 120 + 20; // Ширина элемента + margin
-                const stopPosition = -(winnerIndex * itemWidth - containerWidth/2 + itemWidth/2);
+                const stopPosition = -(winnerIndex * itemWidth - document.querySelector('.case-animation').offsetWidth/2 + itemWidth/2);
                 
                 caseTrack.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
-                caseTrack.style.transform = `translate(${stopPosition}px, -50%)`;
+                caseTrack.style.transform = `translateX(${stopPosition}px)`;
 
-                // После завершения анимации добавляем подарок в инвентарь
                 setTimeout(() => {
-                    const existingGift = userData.inventory.find(g => g.value === userData.currentCasePrize.value);
+                    const existingGift = state.inventory.find(g => g.value === state.currentCasePrize.value);
                     if (existingGift) {
                         existingGift.quantity += 1;
                     } else {
-                        userData.inventory.push({
-                            id: userData.inventory.length + 1,
-                            name: userData.currentCasePrize.name,
-                            value: userData.currentCasePrize.value,
+                        state.inventory.push({
+                            id: state.inventory.length + 1,
+                            name: state.currentCasePrize.name,
+                            value: state.currentCasePrize.value,
                             quantity: 1,
-                            icon: userData.currentCasePrize.icon,
-                            color: userData.currentCasePrize.color
+                            icon: state.currentCasePrize.icon,
+                            color: state.currentCasePrize.color
                         });
                     }
 
-                    showModal('Поздравляем!', `Вы получили ${userData.currentCasePrize.name.toLowerCase()}!`);
-                    userData.currentCasePrize = null;
+                    showModal('Поздравляем!', `Вы получили ${state.currentCasePrize.name.toLowerCase()}!`);
+                    state.isSpinning = false;
+                    state.currentCasePrize = null;
                 }, 3000);
-            }, 100);
+            }, 50);
         }
 
-        // Получение имени подарка по ценности
+        function getPossiblePrizes(price) {
+            if (price === 100) {
+                return [
+                    casePrizes[0], casePrizes[0], casePrizes[0], casePrizes[0], casePrizes[0],
+                    casePrizes[1], casePrizes[1],
+                    casePrizes[2]
+                ];
+            } else if (price === 500) {
+                return [
+                    casePrizes[1], casePrizes[1], casePrizes[1],
+                    casePrizes[2], casePrizes[2],
+                    casePrizes[3]
+                ];
+            } else {
+                return [
+                    casePrizes[2], casePrizes[2],
+                    casePrizes[3]
+                ];
+            }
+        }
+
+        function getRandomPrize(possiblePrizes) {
+            return possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
+        }
+
         function getGiftNameByValue(value) {
             switch (value) {
                 case 100: return "Обычный подарок";
@@ -1029,14 +1012,12 @@
             }
         }
 
-        // Показать модальное окно
         function showModal(title, content) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('result-modal').classList.add('active');
         }
 
-        // Закрыть модальное окно
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }

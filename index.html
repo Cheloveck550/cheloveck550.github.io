@@ -131,6 +131,8 @@
             align-items: center;
             justify-content: center;
             min-height: 80px;
+            color: var(--text-color);
+            text-decoration: none;
         }
 
         .menu-button:hover {
@@ -200,7 +202,6 @@
             width: 300px;
             height: 300px;
             margin: 30px auto;
-            perspective: 1000px;
         }
 
         .wheel {
@@ -226,13 +227,11 @@
             overflow: hidden;
         }
 
-        .wheel-section span {
+        .wheel-section i {
             position: absolute;
-            transform: rotate(45deg) translateX(50px);
-            font-weight: bold;
-            font-size: 14px;
+            font-size: 24px;
+            transform: translate(40px, -40px) rotate(45deg);
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            white-space: nowrap;
         }
 
         .wheel-center {
@@ -256,14 +255,14 @@
 
         .wheel-arrow {
             position: absolute;
-            top: -20px;
+            top: -10px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 30px solid #ff6bff;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #ff6bff;
             filter: drop-shadow(0 0 5px rgba(255, 107, 255, 0.7));
             z-index: 5;
         }
@@ -295,9 +294,9 @@
         .case-track {
             display: flex;
             position: absolute;
-            left: 0;
+            left: 50%;
             top: 50%;
-            transform: translateY(-50%);
+            transform: translate(-50%, -50%);
             transition: transform 3s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
 
@@ -555,7 +554,7 @@
                 <div class="wheel" id="upgrade-wheel">
                     <!-- Секции колеса апгрейда будут добавлены через JS -->
                 </div>
-                <div class="wheel-center">Апгрейд</div>
+                <div class="wheel-center" onclick="spinUpgradeWheel()">Апгрейд</div>
             </div>
 
             <p style="text-align: center; margin: 20px 0;">Выберите 3 подарка для апгрейда</p>
@@ -633,14 +632,14 @@
 
         // Призы для рулетки
         const roulettePrizes = [
-            { type: "diamonds", value: 50, text: "50💎" },
-            { type: "diamonds", value: 100, text: "100💎" },
-            { type: "diamonds", value: 200, text: "200💎" },
-            { type: "gift", value: 100, text: "Подарок" },
-            { type: "diamonds", value: 150, text: "150💎" },
-            { type: "nothing", value: 0, text: "Увы :(" },
-            { type: "diamonds", value: 300, text: "300💎" },
-            { type: "gift", value: 500, text: "Редкий" }
+            { type: "diamonds", value: 50, text: "50💎", icon: "fas fa-gem" },
+            { type: "diamonds", value: 100, text: "100💎", icon: "fas fa-gem" },
+            { type: "diamonds", value: 200, text: "200💎", icon: "fas fa-gem" },
+            { type: "gift", value: 100, text: "Подарок", icon: "fas fa-gift" },
+            { type: "diamonds", value: 150, text: "150💎", icon: "fas fa-gem" },
+            { type: "nothing", value: 0, text: "Увы :(", icon: "fas fa-sad-tear" },
+            { type: "diamonds", value: 300, text: "300💎", icon: "fas fa-gem" },
+            { type: "gift", value: 500, text: "Редкий", icon: "fas fa-gem" }
         ];
 
         // Возможные призы для кейсов
@@ -734,11 +733,11 @@
                 section.style.transform = `rotate(${sectionAngle * index}deg)`;
                 section.style.background = wheelColors[index % wheelColors.length];
 
-                const span = document.createElement('span');
-                span.textContent = prize.text;
-                span.style.color = index < roulettePrizes.length / 2 ? '#fff' : '#000';
+                const icon = document.createElement('i');
+                icon.className = prize.icon;
+                icon.style.color = index < roulettePrizes.length / 2 ? '#fff' : '#000';
 
-                section.appendChild(span);
+                section.appendChild(icon);
                 wheel.appendChild(section);
             });
         }
@@ -759,11 +758,11 @@
                 section.style.transform = `rotate(${sectionAngle * index}deg)`;
                 section.style.background = gift.color || wheelColors[index % wheelColors.length];
 
-                const span = document.createElement('span');
-                span.innerHTML = `<i class="${gift.icon}"></i>`;
-                span.style.color = '#fff';
+                const icon = document.createElement('i');
+                icon.className = gift.icon;
+                icon.style.color = '#fff';
 
-                section.appendChild(span);
+                section.appendChild(icon);
                 wheel.appendChild(section);
             });
         }
@@ -798,7 +797,7 @@
                 // После завершения анимации определяем выигрыш
                 setTimeout(() => {
                     const sectionAngle = 360 / roulettePrizes.length;
-                    const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360) / sectionAngle);
+                    const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360 / sectionAngle);
                     const prize = roulettePrizes[winningIndex];
 
                     // Подсвечиваем выигравший сектор
@@ -868,7 +867,7 @@
 
             setTimeout(() => {
                 const sectionAngle = 360 / gifts.length;
-                const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360) / sectionAngle);
+                const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360 / sectionAngle);
                 const selectedGift = gifts[winningIndex];
 
                 userData.selectedGifts.push(selectedGift);
@@ -938,7 +937,7 @@
 
             const caseTrack = document.getElementById('case-track');
             caseTrack.innerHTML = '';
-            caseTrack.style.transform = 'translateX(0)';
+            caseTrack.style.transform = 'translate(-50%, -50%)';
 
             // Определяем возможные призы для этого кейса
             let possiblePrizes = [];
@@ -963,15 +962,14 @@
 
             // Создаем трек с призами для анимации
             const trackLength = 50; // Количество призов в треке
-            const winnerIndex = Math.floor(Math.random() * (trackLength - 10)) + 5; // Позиция выигрыша
+            const winnerIndex = 25; // Фиксированная позиция выигрыша (середина)
+            
+            // Выбираем случайный приз из возможных
+            const winnerPrize = possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
             
             // Заполняем трек призами
             for (let i = 0; i < trackLength; i++) {
-                const prizeIndex = i === winnerIndex ? 
-                    Math.floor(Math.random() * possiblePrizes.length) : // Выигрышный приз
-                    Math.floor(Math.random() * casePrizes.length); // Любой приз для анимации
-                
-                const prize = i === winnerIndex ? possiblePrizes[prizeIndex] : casePrizes[prizeIndex];
+                const prize = i === winnerIndex ? winnerPrize : casePrizes[Math.floor(Math.random() * casePrizes.length)];
                 
                 const caseItem = document.createElement('div');
                 caseItem.className = 'case-item';
@@ -986,16 +984,13 @@
             setTimeout(() => {
                 const trackWidth = caseTrack.offsetWidth;
                 const containerWidth = document.querySelector('.case-animation').offsetWidth;
-                const stopPosition = -(trackWidth - containerWidth / 2 - 60); // Остановка на выигрышном призе
+                const stopPosition = -(trackWidth / 2 - containerWidth / 2 - 120 * winnerIndex);
                 
                 caseTrack.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
-                caseTrack.style.transform = `translateX(${stopPosition}px)`;
+                caseTrack.style.transform = `translate(${stopPosition}px, -50%)`;
 
-                // После завершения анимации определяем выигрыш
+                // После завершения анимации добавляем подарок в инвентарь
                 setTimeout(() => {
-                    const winnerPrize = possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
-                    
-                    // Добавляем подарок в инвентарь
                     const existingGift = userData.inventory.find(g => g.value === winnerPrize.value);
                     if (existingGift) {
                         existingGift.quantity += 1;

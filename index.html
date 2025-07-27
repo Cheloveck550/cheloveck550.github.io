@@ -214,6 +214,7 @@
             box-shadow: 0 0 0 8px rgba(90, 10, 160, 0.5),
                         0 0 30px rgba(0, 0, 0, 0.5);
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transform: rotate(0deg);
         }
 
         .wheel-section {
@@ -619,7 +620,8 @@
             ],
             selectedGifts: [],
             currentBet: 100,
-            isSpinning: false
+            isSpinning: false,
+            currentCasePrize: null
         };
 
         // Цвета для колеса рулетки
@@ -724,6 +726,7 @@
         function initWheel() {
             const wheel = document.getElementById('wheel');
             wheel.innerHTML = '';
+            wheel.style.transform = 'rotate(0deg)';
 
             const sectionAngle = 360 / roulettePrizes.length;
 
@@ -783,7 +786,12 @@
             const wheel = document.getElementById('wheel');
             const spinDuration = 4000; // 4 секунды анимации
             const spins = 5; // Количество полных оборотов
-            const randomAngle = Math.floor(Math.random() * 360); // Случайный угол остановки
+            
+            // Случайный угол остановки (смещение на половину сектора для точного попадания в стрелку)
+            const sectionAngle = 360 / roulettePrizes.length;
+            const winningIndex = Math.floor(Math.random() * roulettePrizes.length);
+            const randomAngle = winningIndex * sectionAngle + sectionAngle/2;
+            
             const totalRotation = spins * 360 + randomAngle; // Общий угол поворота
 
             // Добавляем класс для анимации вращения
@@ -796,8 +804,6 @@
 
                 // После завершения анимации определяем выигрыш
                 setTimeout(() => {
-                    const sectionAngle = 360 / roulettePrizes.length;
-                    const winningIndex = Math.floor(((360 - (totalRotation % 360)) % 360 / sectionAngle);
                     const prize = roulettePrizes[winningIndex];
 
                     // Подсвечиваем выигравший сектор
@@ -960,16 +966,16 @@
                 ];
             }
 
+            // Выбираем случайный приз из возможных
+            userData.currentCasePrize = possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
+            
             // Создаем трек с призами для анимации
             const trackLength = 50; // Количество призов в треке
             const winnerIndex = 25; // Фиксированная позиция выигрыша (середина)
             
-            // Выбираем случайный приз из возможных
-            const winnerPrize = possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
-            
             // Заполняем трек призами
             for (let i = 0; i < trackLength; i++) {
-                const prize = i === winnerIndex ? winnerPrize : casePrizes[Math.floor(Math.random() * casePrizes.length)];
+                const prize = i === winnerIndex ? userData.currentCasePrize : casePrizes[Math.floor(Math.random() * casePrizes.length)];
                 
                 const caseItem = document.createElement('div');
                 caseItem.className = 'case-item';
@@ -984,28 +990,30 @@
             setTimeout(() => {
                 const trackWidth = caseTrack.offsetWidth;
                 const containerWidth = document.querySelector('.case-animation').offsetWidth;
-                const stopPosition = -(trackWidth / 2 - containerWidth / 2 - 120 * winnerIndex);
+                const itemWidth = 120 + 20; // Ширина элемента + margin
+                const stopPosition = -(winnerIndex * itemWidth - containerWidth/2 + itemWidth/2);
                 
                 caseTrack.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
                 caseTrack.style.transform = `translate(${stopPosition}px, -50%)`;
 
                 // После завершения анимации добавляем подарок в инвентарь
                 setTimeout(() => {
-                    const existingGift = userData.inventory.find(g => g.value === winnerPrize.value);
+                    const existingGift = userData.inventory.find(g => g.value === userData.currentCasePrize.value);
                     if (existingGift) {
                         existingGift.quantity += 1;
                     } else {
                         userData.inventory.push({
                             id: userData.inventory.length + 1,
-                            name: winnerPrize.name,
-                            value: winnerPrize.value,
+                            name: userData.currentCasePrize.name,
+                            value: userData.currentCasePrize.value,
                             quantity: 1,
-                            icon: winnerPrize.icon,
-                            color: winnerPrize.color
+                            icon: userData.currentCasePrize.icon,
+                            color: userData.currentCasePrize.color
                         });
                     }
 
-                    showModal('Поздравляем!', `Вы получили ${winnerPrize.name.toLowerCase()}!`);
+                    showModal('Поздравляем!', `Вы получили ${userData.currentCasePrize.name.toLowerCase()}!`);
+                    userData.currentCasePrize = null;
                 }, 3000);
             }, 100);
         }

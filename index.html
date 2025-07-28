@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro100Gifts</title>
+    <title>NFT Gifts Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #1e0033;
-            --primary-color: #ff6bff;
-            --secondary-color: #3a0472;
+            --bg-color: #1a1b2d;
+            --primary-color: #7b2cbf;
+            --secondary-color: #3a0ca3;
             --text-color: #ffffff;
-            --card-bg: rgba(255, 255, 255, 0.1);
-            --card-border: rgba(255, 255, 255, 0.2);
-            --premium-gold: #FFD700;
-            --premium-purple: #9C27B0;
-            --telegram-blue: #0088cc;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --nft-purple: #9d4edd;
+            --nft-blue: #4361ee;
+            --nft-pink: #f72585;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
@@ -30,26 +31,25 @@
             color: var(--text-color);
             min-height: 100vh;
             padding: 20px;
+            padding-bottom: 80px;
         }
 
         .header {
             text-align: center;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
+            position: relative;
         }
 
         .profile {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 12px;
             background: var(--card-bg);
             border-radius: 16px;
             border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
         }
 
         .profile-pic {
@@ -57,6 +57,7 @@
             height: 50px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid var(--primary-color);
         }
 
         .profile-info {
@@ -64,13 +65,14 @@
         }
 
         .profile-name {
-            font-weight: bold;
+            font-weight: 600;
             font-size: 1.1em;
         }
 
         .profile-username {
             opacity: 0.8;
             font-size: 0.9em;
+            color: #a5a8b6;
         }
 
         .balance-card {
@@ -82,6 +84,15 @@
             border: 1px solid var(--card-border);
             text-align: center;
             font-size: 1.2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .balance-amount {
+            font-weight: 700;
+            color: #f8f9fa;
         }
 
         .section {
@@ -98,7 +109,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Стили для списка подарков */
+        /* NFT Gifts Styles */
         .gifts-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -114,41 +125,37 @@
             border: 1px solid var(--card-border);
             display: flex;
             align-items: center;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .gift-card:hover {
             transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .gift-card.nft {
+            border: 2px solid var(--nft-purple);
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.3);
         }
 
         .gift-card.premium {
-            border: 2px solid var(--premium-gold);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            border: 2px solid var(--nft-blue);
+            box-shadow: 0 0 15px rgba(67, 97, 238, 0.3);
         }
 
-        .gift-card.telegram {
-            border: 2px solid var(--telegram-blue);
-            box-shadow: 0 0 15px rgba(0, 136, 204, 0.3);
+        .gift-card.special {
+            border: 2px solid var(--nft-pink);
+            box-shadow: 0 0 15px rgba(247, 37, 133, 0.3);
         }
 
-        .gift-icon {
-            width: 50px;
-            height: 50px;
+        .gift-image {
+            width: 60px;
+            height: 60px;
             border-radius: 12px;
-            background: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            object-fit: cover;
             margin-right: 15px;
-            font-size: 24px;
-        }
-
-        .gift-icon.premium {
-            background: linear-gradient(135deg, var(--premium-gold), var(--premium-purple));
-        }
-
-        .gift-icon.telegram {
-            background: linear-gradient(135deg, var(--telegram-blue), #00b2ff);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .gift-info {
@@ -158,19 +165,72 @@
         .gift-name {
             font-weight: 600;
             margin-bottom: 5px;
+            color: white;
+        }
+
+        .gift-name.nft {
+            color: var(--nft-purple);
         }
 
         .gift-name.premium {
-            color: var(--premium-gold);
+            color: var(--nft-blue);
         }
 
-        .gift-name.telegram {
-            color: var(--telegram-blue);
+        .gift-name.special {
+            color: var(--nft-pink);
         }
 
-        .gift-quantity {
-            font-size: 0.9em;
-            opacity: 0.8;
+        .gift-description {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .gift-collection {
+            font-size: 0.75em;
+            color: #a5a8b6;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nft-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, var(--nft-purple), #5a189a);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, var(--nft-blue), #3a0ca3);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .special-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, var(--nft-pink), #b5179e);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .send-btn {
@@ -182,21 +242,26 @@
             font-size: 0.9em;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .send-btn:hover {
-            background: #ff45ff;
+            background: #6a1b9a;
+        }
+
+        .send-btn.nft {
+            background: linear-gradient(135deg, var(--nft-purple), #5a189a);
         }
 
         .send-btn.premium {
-            background: linear-gradient(135deg, var(--premium-gold), var(--premium-purple));
+            background: linear-gradient(135deg, var(--nft-blue), #3a0ca3);
         }
 
-        .send-btn.telegram {
-            background: linear-gradient(135deg, var(--telegram-blue), #00b2ff);
+        .send-btn.special {
+            background: linear-gradient(135deg, var(--nft-pink), #b5179e);
         }
 
-        /* Стили для меню */
+        /* Меню и навигация */
         .menu {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -216,34 +281,36 @@
         }
 
         .menu-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(123, 44, 191, 0.2);
         }
 
-        /* Навигационная панель */
         .nav-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(30, 0, 51, 0.9);
+            background: rgba(26, 27, 45, 0.95);
             backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
             padding: 12px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
         }
 
         .nav-btn {
             background: none;
             border: none;
-            color: white;
+            color: #a5a8b6;
             font-size: 24px;
             padding: 10px 20px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .nav-btn.active {
             color: var(--primary-color);
+            transform: translateY(-5px);
         }
 
         /* Модальные окна */
@@ -279,6 +346,7 @@
             border: 1px solid var(--card-border);
             transform: scale(0.9);
             transition: transform 0.3s ease;
+            position: relative;
         }
 
         .modal.active .modal-content {
@@ -289,6 +357,7 @@
             font-size: 1.5em;
             margin-bottom: 15px;
             text-align: center;
+            color: white;
         }
 
         .modal-close {
@@ -297,7 +366,7 @@
             right: 15px;
             background: none;
             border: none;
-            color: white;
+            color: #a5a8b6;
             font-size: 1.5em;
             cursor: pointer;
         }
@@ -313,18 +382,23 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 15px;
+            font-weight: 600;
         }
 
         .btn:hover {
-            background: #ff45ff;
+            background: #6a1b9a;
+        }
+
+        .btn.nft {
+            background: linear-gradient(135deg, var(--nft-purple), #5a189a);
         }
 
         .btn.premium {
-            background: linear-gradient(135deg, var(--premium-gold), var(--premium-purple));
+            background: linear-gradient(135deg, var(--nft-blue), #3a0ca3);
         }
 
-        .btn.telegram {
-            background: linear-gradient(135deg, var(--telegram-blue), #00b2ff);
+        .btn.special {
+            background: linear-gradient(135deg, var(--nft-pink), #b5179e);
         }
 
         /* Анимации */
@@ -345,28 +419,14 @@
             100% { transform: scale(1); }
         }
 
-        .premium-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--premium-gold);
-            color: #000;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 3px 6px;
-            border-radius: 10px;
-        }
-
-        .telegram-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--telegram-blue);
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 3px 6px;
-            border-radius: 10px;
+        /* NFT Preview */
+        .nft-preview {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         /* Колесо рулетки */
@@ -383,8 +443,8 @@
             border-radius: 50%;
             position: relative;
             overflow: hidden;
-            border: 8px solid #3a0472;
-            box-shadow: 0 0 0 8px rgba(90, 10, 160, 0.5),
+            border: 8px solid #3a0ca3;
+            box-shadow: 0 0 0 8px rgba(58, 12, 163, 0.5),
                         0 0 30px rgba(0, 0, 0, 0.5);
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
             transform: rotate(0deg);
@@ -418,12 +478,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
-            border: 5px solid #3a0472;
+            border: 5px solid #3a0ca3;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: #3a0472;
+            color: #3a0ca3;
             cursor: pointer;
         }
 
@@ -436,40 +496,14 @@
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 25px solid #ff6bff;
-            filter: drop-shadow(0 0 5px rgba(255, 107, 255, 0.7));
+            border-top: 25px solid var(--primary-color);
+            filter: drop-shadow(0 0 5px rgba(123, 44, 191, 0.7));
             z-index: 5;
         }
 
         .winning-sector {
             box-shadow: inset 0 0 20px gold, 0 0 20px gold;
             transition: box-shadow 0.5s ease;
-        }
-
-        /* Апгрейд подарков */
-        .upgrade-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .selected-gifts {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .selected-gift {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            background: var(--card-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            border: 2px dashed var(--primary-color);
         }
 
         /* Кейсы */
@@ -524,15 +558,32 @@
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 25px solid #ff6bff;
+            border-top: 25px solid var(--primary-color);
             z-index: 10;
         }
+
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .gift-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .gift-image {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .send-btn {
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="header">
-        <h1>🎁 Pro100Gifts</h1>
+        <h1>🎁 NFT Gifts</h1>
     </div>
 
     <!-- Профиль пользователя -->
@@ -545,7 +596,8 @@
     </div>
 
     <div class="balance-card">
-        Баланс: <span id="balance">1000</span> 💎
+        <i class="fas fa-gem"></i>
+        Баланс: <span id="balance" class="balance-amount">1000</span> 💎
     </div>
 
     <!-- Главный экран -->
@@ -568,7 +620,7 @@
 
     <!-- Раздел подарков -->
     <div id="gifts-section" class="section">
-        <h2>Мои подарки</h2>
+        <h2>Мои NFT подарки</h2>
         <div class="gifts-container" id="gifts-container">
             <!-- Подарки будут загружены здесь -->
         </div>
@@ -604,14 +656,14 @@
 
     <!-- Раздел апгрейда -->
     <div id="upgrade-section" class="section">
-        <h2>Апгрейд подарков</h2>
+        <h2>Апгрейд NFT</h2>
         <div class="upgrade-container">
-            <p>Выберите 3 подарка для апгрейда</p>
+            <p>Выберите 3 NFT для апгрейда</p>
             <div class="selected-gifts" id="selected-gifts">
                 <!-- Выбранные подарки будут здесь -->
             </div>
-            <button class="btn" id="upgrade-btn" disabled>
-                <i class="fas fa-random"></i> Апгрейд
+            <button class="btn nft" id="upgrade-btn" disabled>
+                <i class="fas fa-random"></i> Апгрейд NFT
             </button>
         </div>
 
@@ -624,7 +676,7 @@
 
     <!-- Раздел кейсов -->
     <div id="cases-section" class="section">
-        <h2>Кейсы</h2>
+        <h2>NFT Кейсы</h2>
 
         <div class="case-animation">
             <div class="case-track" id="case-track"></div>
@@ -649,7 +701,7 @@
 
     <!-- Раздел рулетки -->
     <div id="roulette-section" class="section">
-        <h2>Рулетка</h2>
+        <h2>NFT Рулетка</h2>
 
         <div class="wheel-container">
             <div class="wheel-arrow"></div>
@@ -695,10 +747,11 @@
             <button class="modal-close" id="close-send-modal">
                 <i class="fas fa-times"></i>
             </button>
-            <h3 class="modal-title">Отправить подарок</h3>
+            <h3 class="modal-title">Отправить NFT подарок</h3>
             <div id="send-modal-content">
-                <p>Выберите получателя из списка контактов Telegram</p>
-                <button class="btn" id="select-recipient">
+                <img id="nft-preview" class="nft-preview" src="" alt="NFT Preview">
+                <p id="nft-description">Выберите получателя из списка контактов Telegram</p>
+                <button class="btn nft" id="select-recipient">
                     <i class="fas fa-user-friends"></i> Выбрать получателя
                 </button>
             </div>
@@ -710,16 +763,16 @@
             <button class="modal-close" id="close-premium-modal">
                 <i class="fas fa-times"></i>
             </button>
-            <h3 class="modal-title">Редкий подарок!</h3>
+            <h3 class="modal-title">Редкий NFT подарок!</h3>
             <div style="text-align: center; margin: 20px 0;">
                 <div class="gift-animation">
-                    <i class="fas fa-gem" style="color: var(--premium-gold);"></i>
+                    <i class="fas fa-gem" style="color: var(--nft-purple);"></i>
                 </div>
-                <p>Вы получили эксклюзивный подарок из Telegram!</p>
+                <p>Вы получили эксклюзивный NFT подарок из Telegram!</p>
                 <p>Этот подарок можно отправить только избранным пользователям.</p>
             </div>
-            <button class="btn premium" id="claim-premium-gift">
-                <i class="fas fa-gift"></i> Получить подарок
+            <button class="btn nft" id="claim-premium-gift">
+                <i class="fas fa-gift"></i> Получить NFT
             </button>
         </div>
     </div>
@@ -745,7 +798,7 @@
         tg.expand();
         
         // Инициализация основных параметров
-        const BOT_TOKEN = 'YOUR_BOT_TOKEN'; // Замените на токен вашего бота
+        const BOT_TOKEN = '8166750052:AAG5XfoO2BxdCjHiey5zDcE8ti_nZfw5TMY'; // Замените на токен вашего бота
         const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
         const USER_ID = tg.initDataUnsafe.user?.id;
         const WEB_APP_URL = window.location.href.split('?')[0];
@@ -768,70 +821,88 @@
             ]
         };
 
-        // Типы подарков
-        const GIFT_TYPES = {
-            COMMON: {
-                id: 1,
-                name: "Обычный подарок",
-                icon: "fas fa-gift",
-                color: "#4CAF50",
-                premium: false,
-                telegram: false,
-                price: 100
+        // Реальные NFT подарки из Telegram
+        const NFT_GIFTS = {
+            TOY_BEAR: {
+                id: 'toy_bear_4651',
+                name: "Toy Bear #4651",
+                image: "https://cdn4.telegram-cdn.org/file/nft-toy-bear.jpg",
+                description: "Коллекционный мишка из серии NFT",
+                collection: "Toy Animals",
+                type: "nft",
+                price: 500,
+                link: "https://t.me/nft/ToyBear-4651"
             },
-            RARE: {
-                id: 2,
-                name: "Редкий подарок",
-                icon: "fas fa-gem",
-                color: "#2196F3",
-                premium: true,
-                telegram: false,
-                price: 500
+            PEPE_PLUSH: {
+                id: 'pepe_plush_8923',
+                name: "Pepe Plush #8923",
+                image: "https://cdn4.telegram-cdn.org/file/nft-pepe-plush.jpg",
+                description: "Мягкая игрушка Pepe из эксклюзивной коллекции",
+                collection: "Meme Legends",
+                type: "nft",
+                price: 750,
+                link: "https://t.me/nft/PepePlush-8923"
             },
-            EPIC: {
-                id: 3,
-                name: "Эпический подарок",
-                icon: "fas fa-crown",
-                color: "#9C27B0",
-                premium: true,
-                telegram: false,
-                price: 2000
+            BIRTHDAY_CAKE: {
+                id: 'birthday_cake_1234',
+                name: "Birthday Cake #1234",
+                image: "https://cdn4.telegram-cdn.org/file/nft-birthday-cake.jpg",
+                description: "Праздничный торт с анимацией",
+                collection: "Celebrations",
+                type: "nft",
+                price: 300,
+                link: "https://t.me/nft/BirthdayCake-1234"
             },
-            PREMIUM: {
-                id: 4,
-                name: "Премиум подарок",
-                icon: "fas fa-star",
-                color: "#FFD700",
-                premium: true,
-                telegram: false,
-                price: 5000
+            CAP_NFT: {
+                id: 'cap_nft_5678',
+                name: "Cool Cap #5678",
+                image: "https://cdn4.telegram-cdn.org/file/nft-cool-cap.jpg",
+                description: "Стильная кепка с уникальным дизайном",
+                collection: "Fashion Items",
+                type: "nft",
+                price: 400,
+                link: "https://t.me/nft/CoolCap-5678"
             },
-            TG_STICKER: {
-                id: 5,
-                name: "Telegram Стикер",
-                icon: "fas fa-sticker",
-                color: "#0088cc",
-                premium: false,
-                telegram: true,
-                price: 300
+            CALENDAR_NFT: {
+                id: 'calendar_nft_9012',
+                name: "Digital Calendar #9012",
+                image: "https://cdn4.telegram-cdn.org/file/nft-digital-calendar.jpg",
+                description: "Интерактивный календарь с персонализированными событиями",
+                collection: "Utility Items",
+                type: "nft",
+                price: 600,
+                link: "https://t.me/nft/DigitalCalendar-9012"
             },
-            TG_EMOJI: {
-                id: 6,
-                name: "Telegram Эмодзи",
-                icon: "fas fa-smile",
-                color: "#0088cc",
-                premium: false,
-                telegram: true,
-                price: 200
+            // Другие премиум подарки
+            PREMIUM_THEME: {
+                id: 'premium_theme_dark',
+                name: "Premium Dark Theme",
+                image: "https://cdn4.telegram-cdn.org/file/premium-theme-dark.jpg",
+                description: "Эксклюзивная темная тема для Telegram",
+                collection: "Premium Themes",
+                type: "premium",
+                price: 1000,
+                link: "https://t.me/premium_theme/dark"
             },
-            TG_THEME: {
-                id: 7,
-                name: "Telegram Тема",
-                icon: "fas fa-paint-brush",
-                color: "#0088cc",
-                premium: true,
-                telegram: true,
-                price: 1000
+            ANIMATED_EMOJI: {
+                id: 'animated_emoji_heart',
+                name: "Animated Heart Emoji",
+                image: "https://cdn4.telegram-cdn.org/file/animated-heart-emoji.jpg",
+                description: "Анимированное сердце для статуса",
+                collection: "Premium Emoji",
+                type: "premium",
+                price: 800,
+                link: "https://t.me/premium_emoji/heart"
+            },
+            SPECIAL_GIFT: {
+                id: 'special_gift_2023',
+                name: "Special 2023 Gift",
+                image: "https://cdn4.telegram-cdn.org/file/special-2023-gift.jpg",
+                description: "Эксклюзивный подарок к 2023 году",
+                collection: "Special Drops",
+                type: "special",
+                price: 1500,
+                link: "https://t.me/special_gift/2023"
             }
         };
 
@@ -839,30 +910,30 @@
         const ROULETTE_PRIZES = [
             { type: "diamonds", value: 50, text: "50💎", icon: "fas fa-gem" },
             { type: "diamonds", value: 100, text: "100💎", icon: "fas fa-gem" },
-            { type: "gift", value: GIFT_TYPES.COMMON, text: "Обычный подарок", icon: "fas fa-gift" },
+            { type: "gift", value: NFT_GIFTS.BIRTHDAY_CAKE, text: "Birthday Cake", icon: "fas fa-birthday-cake" },
             { type: "diamonds", value: 150, text: "150💎", icon: "fas fa-gem" },
-            { type: "gift", value: GIFT_TYPES.TG_EMOJI, text: "TG Эмодзи", icon: "fas fa-smile" },
+            { type: "gift", value: NFT_GIFTS.CAP_NFT, text: "Cool Cap", icon: "fas fa-hat-cowboy" },
             { type: "nothing", value: 0, text: "Увы :(", icon: "fas fa-sad-tear" },
-            { type: "gift", value: GIFT_TYPES.TG_STICKER, text: "TG Стикер", icon: "fas fa-sticker" },
-            { type: "gift", value: GIFT_TYPES.RARE, text: "Редкий подарок", icon: "fas fa-gem" }
+            { type: "gift", value: NFT_GIFTS.PEPE_PLUSH, text: "Pepe Plush", icon: "fas fa-frog" },
+            { type: "gift", value: NFT_GIFTS.TOY_BEAR, text: "Toy Bear", icon: "fas fa-paw" }
         ];
 
         // Призы для кейсов
         const CASE_PRIZES = {
             common: [
-                { ...GIFT_TYPES.COMMON, chance: 70 },
-                { ...GIFT_TYPES.TG_EMOJI, chance: 20 },
-                { ...GIFT_TYPES.RARE, chance: 10 }
+                { ...NFT_GIFTS.BIRTHDAY_CAKE, chance: 70 },
+                { ...NFT_GIFTS.CAP_NFT, chance: 20 },
+                { ...NFT_GIFTS.ANIMATED_EMOJI, chance: 10 }
             ],
             rare: [
-                { ...GIFT_TYPES.RARE, chance: 60 },
-                { ...GIFT_TYPES.TG_STICKER, chance: 30 },
-                { ...GIFT_TYPES.EPIC, chance: 10 }
+                { ...NFT_GIFTS.PEPE_PLUSH, chance: 60 },
+                { ...NFT_GIFTS.CALENDAR_NFT, chance: 30 },
+                { ...NFT_GIFTS.PREMIUM_THEME, chance: 10 }
             ],
             premium: [
-                { ...GIFT_TYPES.EPIC, chance: 50 },
-                { ...GIFT_TYPES.TG_THEME, chance: 30 },
-                { ...GIFT_TYPES.PREMIUM, chance: 20 }
+                { ...NFT_GIFTS.TOY_BEAR, chance: 50 },
+                { ...NFT_GIFTS.SPECIAL_GIFT, chance: 30 },
+                { ...NFT_GIFTS.PREMIUM_THEME, chance: 20 }
             ]
         };
 
@@ -937,9 +1008,9 @@
                 // Устанавливаем тестовые данные
                 state.balance = 2500;
                 state.gifts = [
-                    { ...GIFT_TYPES.COMMON, quantity: 5 },
-                    { ...GIFT_TYPES.RARE, quantity: 2 },
-                    { ...GIFT_TYPES.TG_EMOJI, quantity: 3 }
+                    { ...NFT_GIFTS.BIRTHDAY_CAKE, quantity: 2 },
+                    { ...NFT_GIFTS.PEPE_PLUSH, quantity: 1 },
+                    { ...NFT_GIFTS.ANIMATED_EMOJI, quantity: 3 }
                 ];
                 
             } catch (error) {
@@ -963,33 +1034,37 @@
             container.innerHTML = '';
             
             if (state.gifts.length === 0) {
-                container.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">У вас пока нет подарков</p>';
+                container.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">У вас пока нет NFT подарков</p>';
                 return;
             }
             
-            // Сортируем подарки: сначала премиум и Telegram, потом обычные
+            // Сортируем подарки: сначала NFT, потом премиум, потом обычные
             const sortedGifts = [...state.gifts].sort((a, b) => {
-                if (a.telegram !== b.telegram) return b.telegram - a.telegram;
-                return b.premium - a.premium;
+                if (a.type === 'nft' && b.type !== 'nft') return -1;
+                if (a.type !== 'nft' && b.type === 'nft') return 1;
+                if (a.type === 'premium' && b.type !== 'premium') return -1;
+                if (a.type !== 'premium' && b.type === 'premium') return 1;
+                return b.price - a.price;
             });
             
             sortedGifts.forEach(gift => {
                 const giftCard = document.createElement('div');
-                giftCard.className = `gift-card ${gift.premium ? 'premium' : ''} ${gift.telegram ? 'telegram' : ''}`;
+                giftCard.className = `gift-card ${gift.type}`;
                 
                 giftCard.innerHTML = `
-                    <div class="gift-icon ${gift.premium ? 'premium' : ''} ${gift.telegram ? 'telegram' : ''}" style="background: ${gift.color}">
-                        <i class="${gift.icon}"></i>
-                        ${gift.premium ? '<span class="premium-badge">PRO</span>' : ''}
-                        ${gift.telegram ? '<span class="telegram-badge">TG</span>' : ''}
-                    </div>
+                    <img src="${gift.image}" class="gift-image" alt="${gift.name}">
                     <div class="gift-info">
-                        <div class="gift-name ${gift.premium ? 'premium' : ''} ${gift.telegram ? 'telegram' : ''}">${gift.name}</div>
-                        <div class="gift-quantity">Количество: ${gift.quantity}</div>
+                        <div class="gift-name ${gift.type}">${gift.name}</div>
+                        <div class="gift-description">${gift.description}</div>
+                        <div class="gift-collection">
+                            <i class="fas fa-layer-group"></i>
+                            ${gift.collection}
+                        </div>
                     </div>
-                    <button class="send-btn ${gift.premium ? 'premium' : ''} ${gift.telegram ? 'telegram' : ''}" data-gift-id="${gift.id}">
+                    <button class="send-btn ${gift.type}" data-gift-id="${gift.id}">
                         Отправить
                     </button>
+                    <span class="${gift.type}-badge">${gift.type.toUpperCase()}</span>
                 `;
                 
                 // Добавляем обработчик выбора для апгрейда
@@ -1016,8 +1091,7 @@
             state.selectedGiftsForUpgrade.forEach(gift => {
                 const giftEl = document.createElement('div');
                 giftEl.className = 'selected-gift';
-                giftEl.style.background = gift.color;
-                giftEl.innerHTML = `<i class="${gift.icon}"></i>`;
+                giftEl.innerHTML = `<img src="${gift.image}" style="width:100%;height:100%;border-radius:10px;object-fit:cover;">`;
                 container.appendChild(giftEl);
             });
             
@@ -1049,7 +1123,7 @@
             // Кнопка отправки подарка
             document.getElementById('send-gift-btn').addEventListener('click', function() {
                 if (state.gifts.length === 0) {
-                    tg.showAlert('У вас нет подарков для отправки');
+                    tg.showAlert('У вас нет NFT подарков для отправки');
                     return;
                 }
                 openModal('send-modal');
@@ -1107,13 +1181,18 @@
             // Обработка кнопок отправки подарков (динамические элементы)
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('send-btn')) {
-                    const giftId = parseInt(e.target.getAttribute('data-gift-id'));
+                    const giftId = e.target.getAttribute('data-gift-id');
                     const gift = state.gifts.find(g => g.id === giftId);
                     
                     if (gift) {
                         state.selectedGift = gift;
                         
-                        if (gift.premium || gift.telegram) {
+                        // Обновляем модальное окно отправки
+                        document.getElementById('nft-preview').src = gift.image;
+                        document.getElementById('nft-description').textContent = 
+                            `Вы собираетесь отправить ${gift.name} из коллекции "${gift.collection}"`;
+                        
+                        if (gift.type === 'nft' || gift.type === 'premium') {
                             openModal('premium-gift-modal');
                         } else {
                             openModal('send-modal');
@@ -1228,7 +1307,7 @@
                     });
                 }
                 
-                message = `Вы выиграли ${gift.name}!`;
+                message = `Вы выиграли NFT подарок: ${gift.name}!`;
             }
             else {
                 message = "К сожалению, вы ничего не выиграли. Попробуйте ещё раз!";
@@ -1290,7 +1369,7 @@
                 const caseItem = document.createElement('div');
                 caseItem.className = 'case-item';
                 if (i === winnerIndex) caseItem.classList.add('winner');
-                caseItem.innerHTML = `<i class="${prize.icon}" style="color: ${prize.color}"></i>`;
+                caseItem.innerHTML = `<img src="${prize.image}" style="width:80%;height:80%;object-fit:contain;">`;
                 caseTrack.appendChild(caseItem);
             }
 
@@ -1315,7 +1394,7 @@
                         });
                     }
 
-                    showResult('Поздравляем!', `Вы получили ${selectedPrize.name}!`);
+                    showResult('Поздравляем!', `Вы получили NFT подарок: ${selectedPrize.name}!`);
                     state.isSpinning = false;
                     
                     updateUI();
@@ -1373,13 +1452,13 @@
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 // Показываем уведомление
-                tg.showAlert(`Подарок "${state.selectedGift.name}" отправлен ${recipient.first_name}!`);
+                tg.showAlert(`NFT подарок "${state.selectedGift.name}" отправлен ${recipient.first_name}!`);
                 
                 // В реальном приложении здесь будет код для отправки сообщения через Bot API
                 if (BOT_TOKEN && BOT_TOKEN !== 'YOUR_BOT_TOKEN') {
                     await sendTelegramMessage(
                         recipient.user_id,
-                        `${tg.initDataUnsafe.user.first_name} отправил вам подарок: ${state.selectedGift.name}!`,
+                        `${tg.initDataUnsafe.user.first_name} отправил вам NFT подарок: ${state.selectedGift.name}!`,
                         state.selectedGift
                     );
                 }
@@ -1391,7 +1470,7 @@
                 
             } catch (error) {
                 console.error('Ошибка отправки подарка:', error);
-                tg.showAlert('Не удалось отправить подарок. Пожалуйста, попробуйте позже.');
+                tg.showAlert('Не удалось отправить NFT подарок. Пожалуйста, попробуйте позже.');
             } finally {
                 state.isLoading = false;
             }
@@ -1412,8 +1491,8 @@
                         reply_markup: {
                             inline_keyboard: [[
                                 {
-                                    text: 'Открыть подарок �',
-                                    url: `${WEB_APP_URL}?gift_won=${getGiftTypeKey(gift)}`
+                                    text: 'Открыть NFT подарок 🎁',
+                                    url: `${WEB_APP_URL}?gift_won=${gift.id}`
                                 }
                             ]]
                         }
@@ -1426,23 +1505,6 @@
                 console.error('Ошибка отправки сообщения:', error);
                 return false;
             }
-        }
-
-        // Получение ключа типа подарка
-        function getGiftTypeKey(gift) {
-            if (gift.telegram) {
-                if (gift.name.includes('Стикер')) return 'tg_sticker';
-                if (gift.name.includes('Эмодзи')) return 'tg_emoji';
-                if (gift.name.includes('Тема')) return 'tg_theme';
-            }
-            
-            if (gift.premium) {
-                if (gift.name.includes('Премиум')) return 'premium';
-                if (gift.name.includes('Эпический')) return 'epic';
-                return 'rare';
-            }
-            
-            return 'common';
         }
 
         // Получение премиум подарка
@@ -1463,7 +1525,7 @@
                 }
                 
                 // Показываем уведомление
-                tg.showAlert(`Поздравляем! Вы получили ${state.selectedGift.name}!`);
+                tg.showAlert(`Поздравляем! Вы получили NFT подарок: ${state.selectedGift.name}!`);
                 
                 // Обновляем интерфейс
                 updateUI();
@@ -1472,7 +1534,7 @@
                 
             } catch (error) {
                 console.error('Ошибка получения подарка:', error);
-                tg.showAlert('Не удалось получить подарок. Пожалуйста, попробуйте позже.');
+                tg.showAlert('Не удалось получить NFT подарок. Пожалуйста, попробуйте позже.');
             } finally {
                 state.isLoading = false;
             }
@@ -1481,7 +1543,7 @@
         // Выбор подарка для апгрейда
         function selectGiftForUpgrade(gift) {
             if (state.selectedGiftsForUpgrade.some(g => g.id === gift.id && g.quantity <= 1)) {
-                tg.showAlert('У вас недостаточно таких подарков для апгрейда');
+                tg.showAlert('У вас недостаточно таких NFT для апгрейда');
                 return;
             }
             
@@ -1490,14 +1552,14 @@
             const availableGifts = state.gifts.find(g => g.id === gift.id)?.quantity || 0;
             
             if (sameGiftsCount >= availableGifts) {
-                tg.showAlert('У вас недостаточно таких подарков');
+                tg.showAlert('У вас недостаточно таких NFT');
                 return;
             }
             
             // Добавляем подарок в выбранные
             state.selectedGiftsForUpgrade.push(gift);
             
-            // Если выбрано 3 подарка, предлагаем сделать апгрейд
+            // Если выбрано 3 NFT, предлагаем сделать апгрейд
             if (state.selectedGiftsForUpgrade.length === 3) {
                 document.getElementById('upgrade-btn').disabled = false;
             }
@@ -1515,34 +1577,23 @@
             // Создаем новый подарок более высокого уровня
             let newGift;
             
-            switch (minLevel) {
-                case 100: // Обычные -> Редкие
-                    newGift = GIFT_TYPES.RARE;
-                    break;
-                case 500: // Редкие -> Эпические
-                    newGift = GIFT_TYPES.EPIC;
-                    break;
-                case 2000: // Эпические -> Премиум
-                    newGift = GIFT_TYPES.PREMIUM;
-                    break;
-                default:
-                    // Если это Telegram-подарки, даем случайный более ценный
-                    if (state.selectedGiftsForUpgrade.some(g => g.telegram)) {
-                        const tgGifts = [GIFT_TYPES.TG_STICKER, GIFT_TYPES.TG_EMOJI, GIFT_TYPES.TG_THEME]
-                            .filter(g => g.price > minLevel);
-                        
-                        if (tgGifts.length > 0) {
-                            newGift = tgGifts[Math.floor(Math.random() * tgGifts.length)];
-                        } else {
-                            newGift = GIFT_TYPES.TG_THEME;
-                        }
-                    } else {
-                        // Для неизвестных типов просто даем алмазы
-                        state.balance += minLevel * 3;
-                        showResult('Апгрейд', `Вы получили ${minLevel * 3} 💎 за 3 подарка!`);
-                        removeUsedGifts();
-                        return;
-                    }
+            if (state.selectedGiftsForUpgrade.every(g => g.type === 'nft')) {
+                // Апгрейд NFT
+                const nftGifts = Object.values(NFT_GIFTS).filter(g => g.type === 'nft' && g.price > minLevel);
+                if (nftGifts.length > 0) {
+                    newGift = nftGifts[Math.floor(Math.random() * nftGifts.length)];
+                } else {
+                    newGift = NFT_GIFTS.TOY_BEAR;
+                }
+            } else if (state.selectedGiftsForUpgrade.every(g => g.type === 'premium')) {
+                // Апгрейд премиум подарков
+                newGift = NFT_GIFTS.SPECIAL_GIFT;
+            } else {
+                // Смешанный апгрейд
+                state.balance += minLevel * 3;
+                showResult('Апгрейд', `Вы получили ${minLevel * 3} 💎 за 3 NFT!`);
+                removeUsedGifts();
+                return;
             }
             
             // Удаляем использованные подарки
@@ -1560,7 +1611,7 @@
                 });
             }
             
-            showResult('Апгрейд', `Вы получили ${newGift.name}!`);
+            showResult('Апгрейд NFT', `Вы получили новый NFT подарок: ${newGift.name}!`);
             updateUI();
         }
 
@@ -1589,30 +1640,12 @@
         }
 
         // Обработка выигранного подарка из параметров URL
-        function handleWonGift(giftType) {
-            let gift;
+        function handleWonGift(giftId) {
+            const gift = Object.values(NFT_GIFTS).find(g => g.id === giftId);
             
-            switch (giftType) {
-                case 'premium':
-                    gift = GIFT_TYPES.PREMIUM;
-                    break;
-                case 'epic':
-                    gift = GIFT_TYPES.EPIC;
-                    break;
-                case 'rare':
-                    gift = GIFT_TYPES.RARE;
-                    break;
-                case 'tg_sticker':
-                    gift = GIFT_TYPES.TG_STICKER;
-                    break;
-                case 'tg_emoji':
-                    gift = GIFT_TYPES.TG_EMOJI;
-                    break;
-                case 'tg_theme':
-                    gift = GIFT_TYPES.TG_THEME;
-                    break;
-                default:
-                    gift = GIFT_TYPES.COMMON;
+            if (!gift) {
+                console.error('Unknown gift ID:', giftId);
+                return;
             }
             
             // Добавляем подарок в инвентарь
@@ -1628,7 +1661,7 @@
             }
             
             // Показываем модальное окно
-            if (gift.premium || gift.telegram) {
+            if (gift.type === 'nft' || gift.type === 'premium') {
                 state.selectedGift = gift;
                 openModal('premium-gift-modal');
             } else {

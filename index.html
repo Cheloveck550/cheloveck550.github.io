@@ -776,8 +776,7 @@
         tg.expand();
         
         // Основные параметры
-        const BOT_TOKEN = '8166750052:AAG5XfoO2BxdCjHiey5zDcE8ti_nZfw5TMY'; // Замените на реальный токен
-        const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+        const SERVER_URL = 'https://your-server-address.com'; // Замените на ваш сервер
         const USER_ID = tg.initDataUnsafe.user?.id;
         const WEB_APP_URL = window.location.href.split('?')[0];
         
@@ -808,7 +807,6 @@
             }
             
             await loadUserData();
-            await loadAvailableGifts();
             updateUserProfile();
             setupEventListeners();
             updateUI();
@@ -819,92 +817,31 @@
             if (giftWon) handleWonGift(giftWon);
         });
 
-        // Загрузка доступных подарков из Telegram
-        async function loadAvailableGifts() {
-            try {
-                // В реальном приложении здесь будет запрос к вашему бэкенду
-                // который вызывает метод getAvailableGifts Telegram Bot API
-                
-                // Имитация ответа с реальными подарками
-                state.availableGifts = [
-                    {
-                        id: 'gift_toy_bear',
-                        name: "Toy Bear NFT",
-                        description: "Эксклюзивный NFT мишка",
-                        star_count: 500,
-                        type: "nft",
-                        icon: "fas fa-paw",
-                        image: "https://cdn4.telegram-cdn.org/file/nft-toy-bear.jpg"
-                    },
-                    {
-                        id: 'gift_premium_theme',
-                        name: "Premium Dark Theme",
-                        description: "Эксклюзивная темная тема",
-                        star_count: 1000,
-                        type: "premium",
-                        icon: "fas fa-moon",
-                        image: "https://cdn4.telegram-cdn.org/file/premium-theme-dark.jpg"
-                    },
-                    {
-                        id: 'gift_animated_heart',
-                        name: "Animated Heart",
-                        description: "Анимированное сердце",
-                        star_count: 300,
-                        type: "special",
-                        icon: "fas fa-heart",
-                        image: "https://cdn4.telegram-cdn.org/file/animated-heart-emoji.jpg"
-                    },
-                    {
-                        id: 'gift_cap_nft',
-                        name: "Cool Cap NFT",
-                        description: "Стильная NFT кепка",
-                        star_count: 400,
-                        type: "nft",
-                        icon: "fas fa-hat-cowboy",
-                        image: "https://cdn4.telegram-cdn.org/file/nft-cool-cap.jpg"
-                    },
-                    {
-                        id: 'gift_calendar_nft',
-                        name: "Digital Calendar",
-                        description: "Интерактивный календарь",
-                        star_count: 600,
-                        type: "nft",
-                        icon: "fas fa-calendar",
-                        image: "https://cdn4.telegram-cdn.org/file/nft-digital-calendar.jpg"
-                    }
-                ];
-            } catch (error) {
-                console.error('Ошибка загрузки подарков:', error);
-                tg.showAlert('Не удалось загрузить доступные подарки');
-            }
-        }
-
         // Загрузка данных пользователя
         async function loadUserData() {
             try {
-                // Имитация загрузки данных пользователя
-                state.balance = 2500;
-                state.gifts = [
-                    { 
-                        id: 'gift_animated_heart', 
-                        name: "Animated Heart", 
-                        star_count: 300,
-                        type: "special",
-                        quantity: 3,
-                        image: "https://cdn4.telegram-cdn.org/file/animated-heart-emoji.jpg"
+                const response = await fetch(`${SERVER_URL}/api/getUserData`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
                     },
-                    { 
-                        id: 'gift_cap_nft', 
-                        name: "Cool Cap NFT", 
-                        star_count: 400,
-                        type: "nft",
-                        quantity: 2,
-                        image: "https://cdn4.telegram-cdn.org/file/nft-cool-cap.jpg"
-                    }
-                ];
+                    body: JSON.stringify({
+                        user_id: USER_ID
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.ok) {
+                    state.balance = data.result.balance;
+                    state.gifts = data.result.gifts;
+                    state.availableGifts = data.result.available_gifts;
+                } else {
+                    tg.showAlert('Ошибка загрузки данных: ' + (data.error || 'Неизвестная ошибка'));
+                }
             } catch (error) {
                 console.error('Ошибка загрузки данных:', error);
-                tg.showAlert('Не удалось загрузить данные пользователя');
+                tg.showAlert('Не удалось загрузить данные. Проверьте подключение к интернету');
             }
         }
 
@@ -948,23 +885,24 @@
             }
             
             state.gifts.forEach(gift => {
+                const giftData = state.availableGifts.find(g => g.id === gift.id) || gift;
                 const giftCard = document.createElement('div');
-                giftCard.className = `gift-card ${gift.type}`;
+                giftCard.className = `gift-card ${giftData.type || 'nft'}`;
                 
                 giftCard.innerHTML = `
-                    <img src="${gift.image}" class="gift-image" alt="${gift.name}">
+                    <img src="${giftData.image_url || gift.image_url}" class="gift-image" alt="${giftData.title}">
                     <div class="gift-info">
-                        <div class="gift-name ${gift.type}">${gift.name}</div>
-                        <div class="gift-description">${gift.description}</div>
+                        <div class="gift-name ${giftData.type || 'nft'}">${giftData.title}</div>
+                        <div class="gift-description">${giftData.description || 'Эксклюзивный NFT подарок'}</div>
                         <div class="gift-collection">
                             <i class="fas fa-gem"></i>
-                            ${gift.star_count} 💎
+                            ${giftData.star_count || 0} 💎
                         </div>
                     </div>
-                    <button class="send-btn ${gift.type}" data-gift-id="${gift.id}">
+                    <button class="send-btn ${giftData.type || 'nft'}" data-gift-id="${gift.id}">
                         Отправить
                     </button>
-                    <span class="${gift.type}-badge">${gift.type.toUpperCase()}</span>
+                    <span class="${giftData.type || 'nft'}-badge">${(giftData.type || 'NFT').toUpperCase()}</span>
                 `;
                 
                 container.appendChild(giftCard);
@@ -982,9 +920,10 @@
             container.innerHTML = '';
             
             state.selectedGiftsForUpgrade.forEach(gift => {
+                const giftData = state.availableGifts.find(g => g.id === gift.id) || gift;
                 const giftEl = document.createElement('div');
                 giftEl.className = 'selected-gift';
-                giftEl.innerHTML = `<img src="${gift.image}" style="width:100%;height:100%;border-radius:10px;object-fit:cover;">`;
+                giftEl.innerHTML = `<img src="${giftData.image_url || gift.image_url}" style="width:100%;height:100%;border-radius:10px;object-fit:cover;">`;
                 container.appendChild(giftEl);
             });
             
@@ -1058,14 +997,15 @@
                 if (e.target.classList.contains('send-btn')) {
                     const giftId = e.target.getAttribute('data-gift-id');
                     const gift = state.gifts.find(g => g.id === giftId);
+                    const giftData = state.availableGifts.find(g => g.id === giftId) || gift;
                     
                     if (gift) {
-                        state.selectedGift = gift;
-                        document.getElementById('nft-preview').src = gift.image;
+                        state.selectedGift = {...gift, ...giftData};
+                        document.getElementById('nft-preview').src = giftData.image_url || gift.image_url;
                         document.getElementById('nft-description').textContent = 
-                            `Вы собираетесь отправить ${gift.name} за ${gift.star_count} звёзд`;
+                            `Вы собираетесь отправить ${giftData.title} за ${giftData.star_count || 0} звёзд`;
                         
-                        if (gift.type === 'nft' || gift.type === 'premium') {
+                        if (giftData.type === 'nft' || giftData.type === 'premium') {
                             openModal('premium-gift-modal');
                         } else {
                             openModal('send-modal');
@@ -1081,6 +1021,10 @@
                 section.classList.remove('active');
             });
             document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'roulette-section') {
+                initWheel();
+            }
             
             if (sectionId !== 'upgrade-section') {
                 state.selectedGiftsForUpgrade = [];
@@ -1102,7 +1046,7 @@
                 section.style.background = state.wheelColors[index % state.wheelColors.length];
 
                 const icon = document.createElement('i');
-                icon.className = gift.icon;
+                icon.className = gift.icon || 'fas fa-gift';
                 icon.style.color = index < state.availableGifts.length / 2 ? '#fff' : '#000';
 
                 section.appendChild(icon);
@@ -1157,16 +1101,20 @@
             const existingGift = state.gifts.find(g => g.id === prize.id);
             
             if (existingGift) {
-                existingGift.quantity += 1;
+                existingGift.quantity = (existingGift.quantity || 0) + 1;
             } else {
                 state.gifts.push({
-                    ...prize,
-                    quantity: 1
+                    id: prize.id,
+                    title: prize.title,
+                    star_count: prize.star_count,
+                    type: prize.type,
+                    quantity: 1,
+                    image_url: prize.image_url
                 });
             }
             
             updateUI();
-            showResult('Поздравляем!', `Вы выиграли: ${prize.name} за ${prize.star_count} звёзд!`);
+            showResult('Поздравляем!', `Вы выиграли: ${prize.title} за ${prize.star_count} звёзд!`);
         }
 
         // Открытие кейса
@@ -1207,7 +1155,7 @@
                 const caseItem = document.createElement('div');
                 caseItem.className = 'case-item';
                 if (i === winnerIndex) caseItem.classList.add('winner');
-                caseItem.innerHTML = `<img src="${prize.image}" style="width:80%;height:80%;object-fit:contain;">`;
+                caseItem.innerHTML = `<img src="${prize.image_url}" style="width:80%;height:80%;object-fit:contain;">`;
                 caseTrack.appendChild(caseItem);
             }
 
@@ -1222,15 +1170,19 @@
                     const existingGift = state.gifts.find(g => g.id === selectedPrize.id);
                     
                     if (existingGift) {
-                        existingGift.quantity += 1;
+                        existingGift.quantity = (existingGift.quantity || 0) + 1;
                     } else {
                         state.gifts.push({
-                            ...selectedPrize,
-                            quantity: 1
+                            id: selectedPrize.id,
+                            title: selectedPrize.title,
+                            star_count: selectedPrize.star_count,
+                            type: selectedPrize.type,
+                            quantity: 1,
+                            image_url: selectedPrize.image_url
                         });
                     }
 
-                    showResult('Поздравляем!', `Вы получили NFT подарок: ${selectedPrize.name}!`);
+                    showResult('Поздравляем!', `Вы получили NFT подарок: ${selectedPrize.title}!`);
                     state.isSpinning = false;
                     updateUI();
                 }, 3000);
@@ -1241,7 +1193,7 @@
         function selectRecipient() {
             if (!state.selectedGift) return;
             
-            if (tg.platform !== 'unknown') {
+            if (tg.platform !== 'unknown' && tg.openContactPicker) {
                 tg.openContactPicker({
                     onSelect: function(contact) {
                         sendGiftToRecipient(contact);
@@ -1251,11 +1203,11 @@
                     }
                 });
             } else {
+                // Режим тестирования в браузере
                 const testContact = {
                     user_id: 123456789,
                     first_name: "Test",
-                    last_name: "User",
-                    username: "testuser"
+                    last_name: "User"
                 };
                 sendGiftToRecipient(testContact);
             }
@@ -1266,23 +1218,30 @@
             if (!state.selectedGift || !recipient) return;
             
             try {
-                const gift = state.gifts.find(g => g.id === state.selectedGift.id);
-                if (!gift) return;
+                const response = await fetch(`${SERVER_URL}/api/sendGift`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        gift_id: state.selectedGift.id,
+                        recipient_id: recipient.user_id
+                    })
+                });
                 
-                // В реальном приложении здесь будет запрос к вашему бэкенду
-                // который вызывает метод sendGift Telegram Bot API
+                const data = await response.json();
                 
-                // Уменьшаем количество подарков
-                gift.quantity -= 1;
-                if (gift.quantity <= 0) {
-                    state.gifts = state.gifts.filter(g => g.id !== gift.id);
+                if (data.ok) {
+                    state.gifts = data.result.gifts;
+                    state.balance = data.result.new_balance;
+                    tg.showAlert(`NFT подарок "${state.selectedGift.title}" отправлен ${recipient.first_name}!`);
+                    updateUI();
+                    closeModal('send-modal');
+                    state.selectedGift = null;
+                } else {
+                    tg.showAlert('Ошибка отправки: ' + (data.error || 'Неизвестная ошибка'));
                 }
-                
-                tg.showAlert(`NFT подарок "${gift.name}" отправлен ${recipient.first_name}!`);
-                updateUI();
-                closeModal('send-modal');
-                state.selectedGift = null;
-                
             } catch (error) {
                 console.error('Ошибка отправки подарка:', error);
                 tg.showAlert('Не удалось отправить NFT подарок');
@@ -1295,15 +1254,19 @@
                 const existingGift = state.gifts.find(g => g.id === state.selectedGift.id);
                 
                 if (existingGift) {
-                    existingGift.quantity += 1;
+                    existingGift.quantity = (existingGift.quantity || 0) + 1;
                 } else {
                     state.gifts.push({
-                        ...state.selectedGift,
-                        quantity: 1
+                        id: state.selectedGift.id,
+                        title: state.selectedGift.title,
+                        star_count: state.selectedGift.star_count,
+                        type: state.selectedGift.type,
+                        quantity: 1,
+                        image_url: state.selectedGift.image_url
                     });
                 }
                 
-                tg.showAlert(`Поздравляем! Вы получили NFT подарок: ${state.selectedGift.name}!`);
+                tg.showAlert(`Поздравляем! Вы получили NFT подарок: ${state.selectedGift.title}!`);
                 updateUI();
                 closeModal('premium-gift-modal');
                 state.selectedGift = null;
@@ -1312,20 +1275,6 @@
                 console.error('Ошибка получения подарка:', error);
                 tg.showAlert('Не удалось получить NFT подарок');
             }
-        }
-
-        // Выбор подарка для апгрейда
-        function selectGiftForUpgrade(gift) {
-            if (state.selectedGiftsForUpgrade.some(g => g.id === gift.id && g.quantity <= 1)) {
-                tg.showAlert('У вас недостаточно таких NFT для апгрейда');
-                return;
-            }
-            
-            state.selectedGiftsForUpgrade.push(gift);
-            if (state.selectedGiftsForUpgrade.length === 3) {
-                document.getElementById('upgrade-btn').disabled = false;
-            }
-            updateSelectedGifts();
         }
 
         // Апгрейд подарков
@@ -1346,15 +1295,19 @@
             
             const existingGift = state.gifts.find(g => g.id === newGift.id);
             if (existingGift) {
-                existingGift.quantity += 1;
+                existingGift.quantity = (existingGift.quantity || 0) + 1;
             } else {
                 state.gifts.push({
-                    ...newGift,
-                    quantity: 1
+                    id: newGift.id,
+                    title: newGift.title,
+                    star_count: newGift.star_count,
+                    type: newGift.type,
+                    quantity: 1,
+                    image_url: newGift.image_url
                 });
             }
             
-            showResult('Апгрейд NFT', `Вы получили новый NFT подарок: ${newGift.name}!`);
+            showResult('Апгрейд NFT', `Вы получили новый NFT подарок: ${newGift.title}!`);
             updateUI();
         }
 
@@ -1385,11 +1338,15 @@
             
             const existingGift = state.gifts.find(g => g.id === gift.id);
             if (existingGift) {
-                existingGift.quantity += 1;
+                existingGift.quantity = (existingGift.quantity || 0) + 1;
             } else {
                 state.gifts.push({
-                    ...gift,
-                    quantity: 1
+                    id: gift.id,
+                    title: gift.title,
+                    star_count: gift.star_count,
+                    type: gift.type,
+                    quantity: 1,
+                    image_url: gift.image_url
                 });
             }
             
@@ -1397,7 +1354,7 @@
                 state.selectedGift = gift;
                 openModal('premium-gift-modal');
             } else {
-                tg.showAlert(`Вы получили подарок: ${gift.name}!`);
+                tg.showAlert(`Вы получили подарок: ${gift.title}!`);
             }
             
             updateUI();
@@ -1419,9 +1376,6 @@
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
-
-        // Инициализация колеса при первой загрузке
-        setTimeout(initWheel, 500);
     </script>
 </body>
 </html>
